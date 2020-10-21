@@ -1,5 +1,11 @@
 --Diagonal corner cabinet with a variable number of shelves
 
+
+local function get_diag_door_length(general_data, specific_data)
+	local p2 = {specific_data.width - general_data.depth - general_data.thickness, general_data.depth - specific_data.width2 + general_data.gap, 0}
+	local door_length = PYTHAGORAS(p2[1] - general_data.gap, p2[2] + general_data.thickness, 0)
+	return door_length
+end
 local function recreate_diagonal(general_data, specific_data)
 	local cur_elements = {}
 	local base_height = general_data.benchtop_height - specific_data.height - general_data.benchtop_thickness
