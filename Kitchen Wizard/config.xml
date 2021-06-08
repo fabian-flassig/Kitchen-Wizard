@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin xmlns="http://xmlns.pytha.com/plugin_config/1.0">
+  <header>
+    <guid>d0006db1-9a3c-4f44-89a3-aa004af86127</guid>
+    <version>2.0</version>
+    <pytha-version>25.0</pytha-version>
+    <name>Kitchen Wizard</name>
+    <description>The description of your plugin goes here.</description>
+    <licensing>Information about the licensing terms goes here.</licensing>
+  </header>
+  <extension type="function">
+    <entry-point>main</entry-point>
+    <caption>Kitchen Wizard</caption>
+    <description>Create a kitchen.</description>
+    <help-file>help.html</help-file>
+  </extension>
+  <extension type="edit">
+    <id>wizard_history</id>
+    <entry-point>edit_wizard</entry-point>
+  </extension>
+
+
+</plugin>

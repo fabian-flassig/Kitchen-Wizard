@@ -1,0 +1,22 @@
+{
+    "Lua.diagnostics.disable": [
+        "trailing-space",
+        "lowercase-global"
+    ],
+    "xliffSync.baseFile": "localization.base.xlf",
+    "Lua.diagnostics.globals": [
+        "pyui",
+        "pytha",
+        "pyux",
+        "pyloc",
+        "PYTHAGORAS",
+        "ATAN",
+        "COS",
+        "SIN",
+        "ASIN",
+        "ACOS",
+        "pyio",
+        "TAN",
+        "ABS"
+    ]
+}
