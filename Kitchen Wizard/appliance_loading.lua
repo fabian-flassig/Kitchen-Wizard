@@ -64,6 +64,24 @@ function create_sink(general_data, specific_data, file_handle)
 	return parent_group
 end
 
+function create_garbage_bin(general_data, specific_data, file_handle, bottom_inner_cormer)
+	--here the garbage bin under the sink is loaded and placed. This function returns the loaded parts as a handle plus the height of the loaded unit
+
+		local ref_point_coos = {}
+		local loaded_parts = pytha.import_pyo(file_handle)
+		if file_handle == nil then return nil, nil end
+		local garbage_parent_group = pytha.get_element_common_group(loaded_parts)
+		if garbage_parent_group ~= nil then 
+			ref_point_coos = pytha.get_element_ref_point_coordinates(garbage_parent_group)
+			if #ref_point_coos > 0 then 
+				local left_point = {ref_point_coos[1][1], ref_point_coos[1][2], ref_point_coos[1][3]}
+				pytha.move_element(garbage_parent_group, {-left_point[1], -left_point[2], -left_point[3]}) 
+				pytha.move_element(garbage_parent_group, bottom_inner_cormer)
+			end
+		end
+		return garbage_parent_group, ref_point_coos
+	end
+
 function create_oven(general_data, specific_data, file_handle, top_left_corner)
 --here the oven is loaded and placed. This function returns the loaded parts as a handle plus the height of the loaded unit
 	local width = 0
@@ -158,233 +176,96 @@ function create_oven_with_blind(general_data, specific_data, appliance_file, ori
 	return loaded_oven, oven_width, oven_height, ref_point_coos
 end
 
-function sinks_to_front_styles(general_data, specific_data, show_dialog)
 
-	local result_path = pyux.list_pyos(specific_data.appliance_file, show_dialog)
+function appl_to_front_styles(general_data, specific_data, show_dialog, def_folder_key, text)
+
+	local result_path = pyux.list_pyos(specific_data.appliance_file or general_data.default_folders[def_folder_key], show_dialog) or {}
+	local selected_i = 0
 	
-	if result_path ~= nil then 
-		if show_dialog == true and #result_path > 0 then		--only write the default folder when dialog is really being displayed. Otherwise list might get polluted the first time kitchen wizard is being run
-			general_data.default_folders.sink_folder = result_path[1]
+	if show_dialog == true then		--only write the default folder when dialog is really being displayed. Otherwise list might get polluted the first time kitchen wizard is being run
+		if #result_path > 0 then		
+			general_data.default_folders[def_folder_key] = result_path[1]
+		else
+			general_data.default_folders[def_folder_key] = nil
 		end
-		specific_data.appliance_list = {}
-		table.insert(specific_data.appliance_list, {name = pyloc "No sink",
-														ui_function = nil, 
-														file_handle = nil})
-		for i,k in pairs(result_path) do
-			local sink_name = k:get_name()
-			sink_name = string.sub(sink_name, 1, -5)	--remove the last four characters (".pyo").
-			
-			table.insert(specific_data.appliance_list, {name = sink_name,			--inserted with numeric key into general list of front styles. Values of old folders are not deleted...
-														ui_function = nil, 
-														file_handle = k})	--no problem to add the ffile handle to the table here...
-		end
-		table.insert(specific_data.appliance_list, {name = pyloc "--Browse--",
-														ui_function = sinks_to_front_styles, 
-														file_handle = nil})
-	end
-	controls.appliance_model:reset_content()
-	local selected_i = 1
-	for i,k in pairs(specific_data.appliance_list) do 
-		controls.appliance_model:insert_control_item(k.name)
-		if specific_data.appliance_file and specific_data.appliance_file == k.file_handle then 
-			selected_i = i
-			--pyui.alert(k.file_handle:get_name())
-		end
-	end
-	if selected_i == 1 then 
-		specific_data.appliance_file = nil 
-	end
-	if  #specific_data.appliance_list > 2 and selected_i == 1 then 
-		specific_data.appliance_file = specific_data.appliance_list[2].file_handle
-		controls.appliance_model:set_control_selection(2)
-		selected_i = 2
 	else 
-		specific_data.appliance_file = specific_data.appliance_list[selected_i].file_handle
-		controls.appliance_model:set_control_selection(selected_i)
+		selected_i = 1
 	end
-	return selected_i
-end
-
-function hobs_to_front_styles(general_data, specific_data, show_dialog)
-
-	local result_path = pyux.list_pyos(specific_data.appliance_file, show_dialog)
-	
-	if result_path ~= nil then 
-		if show_dialog == true and #result_path > 0 then		--only write the default folder when dialog is really being displayed. Otherwise list might get polluted the first time kitchen wizard is being run
-			general_data.default_folders.hob_folder = result_path[1]
-		end
-		specific_data.appliance_list = {}
-		table.insert(specific_data.appliance_list, {name = pyloc "No hob",
-														ui_function = nil, 
-														file_handle = nil})
-		for i,k in pairs(result_path) do
-			local hob_name = k:get_name()
-			hob_name = string.sub(hob_name, 1, -5)	--remove the last four characters (".pyo").
-			
-			table.insert(specific_data.appliance_list, {name = hob_name,			--inserted with numeric key into general list of front styles. Values of old folders are not deleted...
-														ui_function = nil, 
-														file_handle = k})	--no problem to add the ffile handle to the table here...
-		end
-		table.insert(specific_data.appliance_list, {name = pyloc "--Browse--",
-														ui_function = hobs_to_front_styles, 
-														file_handle = nil})
+	specific_data.aux_values.appliance_list = {}
+	table.insert(specific_data.aux_values.appliance_list, {name = text, 
+													ui_function = nil, 
+													file_handle = nil})
+	for i,k in pairs(result_path) do
+		local filename = k:get_name()
+		filename = string.sub(filename, 1, -5)	--remove the last four characters (".pyo").
+		table.insert(specific_data.aux_values.appliance_list, {name = filename,			--inserted with numeric key into general list of front styles. Values of old folders are not deleted...
+													ui_function = nil, 
+													file_handle = k})	--no problem to add the file handle to the table here...
 	end
-	controls.appliance_model:reset_content()
-	local selected_i = 1
-	for i,k in pairs(specific_data.appliance_list) do 
-		controls.appliance_model:insert_control_item(k.name)
+	table.insert(specific_data.aux_values.appliance_list, {name = pyloc "--Browse--",
+													ui_function = appl_to_front_styles, 
+													file_handle = nil,
+													folder_key = def_folder_key,
+													disp_text = text})
+	for i,k in pairs(specific_data.aux_values.appliance_list) do 
 		if specific_data.appliance_file and specific_data.appliance_file == k.file_handle then 
 			selected_i = i
 		end
 	end
-	if selected_i == 1 then 
-		specific_data.appliance_file = nil 
-	end
-	if  #specific_data.appliance_list > 2 and selected_i == 1 then 
-		specific_data.appliance_file = specific_data.appliance_list[2].file_handle
-		controls.appliance_model:set_control_selection(2)
+	if  #specific_data.aux_values.appliance_list > 2 and selected_i == 0 then 
 		selected_i = 2
-	else 
-		specific_data.appliance_file = specific_data.appliance_list[selected_i].file_handle
-		controls.appliance_model:set_control_selection(selected_i)
 	end
+	if selected_i == 0 then 
+		selected_i = 1
+	end
+	specific_data.appliance_file = specific_data.aux_values.appliance_list[selected_i].file_handle
 	return selected_i
 end
-function ovens_to_front_styles2(general_data, specific_data, show_dialog)
 
-	local result_path = pyux.list_pyos(specific_data.appliance_file2, show_dialog)
-	
-	if result_path ~= nil then 
-		if show_dialog == true and #result_path > 0 then		--only write the default folder when dialog is really being displayed. Otherwise list might get polluted the first time kitchen wizard is being run
-			general_data.default_folders.oven_folder = result_path[1]
+function appl_to_front_styles2(general_data, specific_data, show_dialog, def_folder_key, text)
+
+	local result_path = pyux.list_pyos(specific_data.appliance_file2 or general_data.default_folders[def_folder_key], show_dialog) or {}
+	local selected_i = 0
+
+	if show_dialog == true then		--only write the default folder when dialog is really being displayed. Otherwise list might get polluted the first time kitchen wizard is being run
+		if #result_path > 0 then	
+			general_data.default_folders[def_folder_key] = result_path[1]
+		else
+			general_data.default_folders[def_folder_key] = nil
 		end
-		specific_data.appliance_list2 = {}
-		table.insert(specific_data.appliance_list2, {name = pyloc "No oven",
-														ui_function = nil, 
-														file_handle = nil})
-		for i,k in pairs(result_path) do
-			local oven_name = k:get_name()
-			oven_name = string.sub(oven_name, 1, -5)	--remove the last four characters (".pyo").
-			
-			table.insert(specific_data.appliance_list2, {name = oven_name,			--inserted with numeric key into general list of front styles. Values of old folders are not deleted...
-														ui_function = nil, 
-														file_handle = k})	--no problem to add the ffile handle to the table here...
-		end
-		table.insert(specific_data.appliance_list2, {name = pyloc "--Browse--",
-														ui_function = ovens_to_front_styles2, 
-														file_handle = nil})
+	else 
+		selected_i = 1
 	end
-	controls.appliance_model2:reset_content()
-	local selected_i = 1
-	for i,k in pairs(specific_data.appliance_list2) do 
-		controls.appliance_model2:insert_control_item(k.name)
+	specific_data.aux_values.appliance_list2 = {}
+	table.insert(specific_data.aux_values.appliance_list2, {name = text, -- pyloc "No oven",
+													ui_function = nil, 
+													file_handle = nil})
+	for i,k in pairs(result_path) do
+		local filename = k:get_name()
+		filename = string.sub(filename, 1, -5)	--remove the last four characters (".pyo").
+		
+		table.insert(specific_data.aux_values.appliance_list2, {name = filename,			--inserted with numeric key into general list of front styles. Values of old folders are not deleted...
+													ui_function = nil, 
+													file_handle = k})	--no problem to add the file handle to the table here...
+	end
+	table.insert(specific_data.aux_values.appliance_list2, {name = pyloc "--Browse--",
+													ui_function = appl_to_front_styles2, 
+													file_handle = nil,
+													folder_key = def_folder_key,
+													disp_text = text})
+
+	for i,k in pairs(specific_data.aux_values.appliance_list2) do 
 		if specific_data.appliance_file2 and specific_data.appliance_file2 == k.file_handle then 
 			selected_i = i
 		end
 	end
-	if selected_i == 1 then 
-		specific_data.appliance_file2 = nil 
-	end
-	if  #specific_data.appliance_list2 > 2 and selected_i == 1 then 
-		specific_data.appliance_file2 = specific_data.appliance_list2[2].file_handle
-		controls.appliance_model2:set_control_selection(2)
+	if  #specific_data.aux_values.appliance_list2 > 2 and selected_i == 0 then 
 		selected_i = 2
-	else 
-		specific_data.appliance_file2 = specific_data.appliance_list2[selected_i].file_handle
-		controls.appliance_model2:set_control_selection(selected_i)
 	end
-	return selected_i
-end
-
-
-function ovens_to_front_styles1(general_data, specific_data, show_dialog)
-
-	local result_path = pyux.list_pyos(specific_data.appliance_file, show_dialog)
+	if selected_i == 0 then 
+		selected_i = 1
+	end
+	specific_data.appliance_file2 = specific_data.aux_values.appliance_list2[selected_i].file_handle
 	
-	if result_path ~= nil then 
-		if show_dialog == true and #result_path > 0 then		--only write the default folder when dialog is really being displayed. Otherwise list might get polluted the first time kitchen wizard is being run
-			general_data.default_folders.oven_folder = result_path[1]
-		end
-		specific_data.appliance_list = {}
-		table.insert(specific_data.appliance_list, {name = pyloc "No oven",
-														ui_function = nil, 
-														file_handle = nil})
-		for i,k in pairs(result_path) do
-			local oven_name = k:get_name()
-			oven_name = string.sub(oven_name, 1, -5)	--remove the last four characters (".pyo").
-			
-			table.insert(specific_data.appliance_list, {name = oven_name,			--inserted with numeric key into general list of front styles. Values of old folders are not deleted...
-														ui_function = nil, 
-														file_handle = k})	--no problem to add the ffile handle to the table here...
-		end
-		table.insert(specific_data.appliance_list, {name = pyloc "--Browse--",
-														ui_function = ovens_to_front_styles1, 
-														file_handle = nil})
-	end
-	controls.appliance_model:reset_content()
-	local selected_i = 1
-	for i,k in pairs(specific_data.appliance_list) do 
-		controls.appliance_model:insert_control_item(k.name)
-		if specific_data.appliance_file and specific_data.appliance_file == k.file_handle then 
-			selected_i = i
-		end
-	end
-	if selected_i == 1 then 
-		specific_data.appliance_file = nil 
-	end
-	if  #specific_data.appliance_list > 2 and selected_i == 1 then 
-		specific_data.appliance_file = specific_data.appliance_list[2].file_handle
-		controls.appliance_model:set_control_selection(2)
-		selected_i = 2
-	else 
-		specific_data.appliance_file = specific_data.appliance_list[selected_i].file_handle
-		controls.appliance_model:set_control_selection(selected_i)
-	end
-	return selected_i
-end
-
-function fridges_to_front_styles1(general_data, specific_data, show_dialog)
-
-	local result_path = pyux.list_pyos(specific_data.appliance_file, show_dialog)
-	
-	if result_path ~= nil then 
-		if show_dialog == true and #result_path > 0 then		--only write the default folder when dialog is really being displayed. Otherwise list might get polluted the first time kitchen wizard is being run
-			general_data.default_folders.fridge_folder = result_path[1]
-		end
-		specific_data.appliance_list = {}
-		table.insert(specific_data.appliance_list, {name = pyloc "No fridge",
-														ui_function = nil, 
-														file_handle = nil})
-		for i,k in pairs(result_path) do
-			local name = k:get_name()
-			name = string.sub(name, 1, -5)	--remove the last four characters (".pyo").
-			
-			table.insert(specific_data.appliance_list, {name = name,			--inserted with numeric key into general list of front styles. Values of old folders are not deleted...
-														ui_function = nil, 
-														file_handle = k})	--no problem to add the ffile handle to the table here...
-		end
-		table.insert(specific_data.appliance_list, {name = pyloc "--Browse--",
-														ui_function = fridges_to_front_styles1, 
-														file_handle = nil})
-	end
-	controls.appliance_model:reset_content()
-	local selected_i = 1
-	for i,k in pairs(specific_data.appliance_list) do 
-		controls.appliance_model:insert_control_item(k.name)
-		if specific_data.appliance_file and specific_data.appliance_file == k.file_handle then 
-			selected_i = i
-		end
-	end
-	if selected_i == 1 then 
-		specific_data.appliance_file = nil 
-	end
-	if  #specific_data.appliance_list > 2 and selected_i == 1 then 
-		specific_data.appliance_file = specific_data.appliance_list[2].file_handle
-		controls.appliance_model:set_control_selection(2)
-		selected_i = 2
-	else 
-		specific_data.appliance_file = specific_data.appliance_list[selected_i].file_handle
-		controls.appliance_model:set_control_selection(selected_i)
-	end
 	return selected_i
 end

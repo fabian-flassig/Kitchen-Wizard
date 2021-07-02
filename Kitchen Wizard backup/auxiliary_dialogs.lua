@@ -1,16 +1,4 @@
-
-
-function exit_question(dialog, data)
-	
-	dialog:set_window_title(pyloc "Kitchen Wizard")
-
-	dialog:create_standalone_label({1,2}, pyloc "Really exit Kitchen Wizard?")
-
-	dialog:create_ok_button(1)
-	dialog:create_cancel_button(2)
-	dialog:equalize_column_widths({1,2})
-end
-
+--Simple block example with history
 
 function open_layer_dialog(data)
 
@@ -45,8 +33,8 @@ function layers_dialog(dialog, data)
 	dialog:create_label(4, pyloc "Layer", {align = "center"})
 	dialog:create_label(5, pyloc "Pen", {align = "center"})
 	dialog:create_label(6, pyloc "Linetype", {align = "center"})
---	dialog:create_label(7, pyloc "Material", {align = "center"})
-	dialog:create_align({1,6})
+	dialog:create_label(7, pyloc "Material", {align = "center"})
+	dialog:create_align({1,7})
 	dialog:create_scrollable_group_box({1,7})
 	for i, k in pairs_sorted(attribute_list) do
 		local text = dialog:create_label(1, k.display_name)
@@ -77,12 +65,12 @@ function layers_dialog(dialog, data)
 		local linetype = dialog:create_linetype_list(6)
 		linetype:set_control_selection(k.linetype)
 
---[[ 		local material = dialog:create_button(7, pyloc "none")
+		local material = dialog:create_button(7, pyloc "none")
 		if k.material then
 			material:set_control_text(k.material:get_name())
-		end ]]
+		end
 		
---[[ 		material:set_on_click_handler(function(state)
+		material:set_on_click_handler(function(state)
 			k.material = pyux.select_material(k.material)
 			if k.material then
 				material:set_control_text(k.material:get_name())
@@ -90,7 +78,7 @@ function layers_dialog(dialog, data)
 				material:set_control_text(pyloc "none")
 			end
 			recreate_all(data, true)
-		end) ]]
+		end)
 		name:set_on_change_handler(function(text, new_index)
 			if new_index ~= nil and text ~= nil then 
 				local pos1 = string.find(text, ";")
@@ -115,50 +103,10 @@ function layers_dialog(dialog, data)
 		end)
 	end
 	dialog:end_group_box()
-	dialog:create_align({1,6})
-	local ok = dialog:create_ok_button({5,6})
-	dialog:equalize_column_widths({2,3,4,5,6})
-	
-end
-
-
-function open_materials_dialog(data)
-
-	pyui.run_modal_subdialog(materials_dialog, data)
-	
-end
-
-
-function materials_dialog(dialog, data)
-	
-	dialog:set_window_title(pyloc "Materials")
-	
-	dialog:create_label(1, pyloc "Element type", {align = "center"})
-	dialog:create_label({2,3}, pyloc "Material", {align = "center"})
-	dialog:create_align({1,3})
---	dialog:create_group_box({1,3})
-	for i, k in pairs_sorted(material_list) do
-		local text = dialog:create_label(1, k.display_name)
-
-		local material = dialog:create_button({2,3}, pyloc "none")
-		if k.material then
-			material:set_control_text(k.material:get_name())
-		end
-		
-		material:set_on_click_handler(function(state)
-		k.material = pyux.select_material(k.material)
-		if k.material then
-			material:set_control_text(k.material:get_name())
-		else 
-			material:set_control_text(pyloc "none")
-		end
-		recreate_all(data, true)
-		end)
-	end
---	dialog:end_group_box()
-	dialog:create_align({1,3})
-	local ok = dialog:create_ok_button(3)
-	dialog:equalize_column_widths({1,2,3})
+	dialog:create_align({1,7})
+	local ok = dialog:create_ok_button(6)
+	local cancel = dialog:create_cancel_button(7)
+	dialog:equalize_column_widths({2,3,4,5,6,7})
 	
 end
 
@@ -189,19 +137,16 @@ function settings_dialog(dialog, data)
 	local thickness_back = dialog:create_text_box(2, pyui.format_length(data.thickness_back))
 	dialog:create_label(1, pyloc "Gaps")
 	local gap = dialog:create_text_box(2, pyui.format_length(data.gap))
+	dialog:create_label(1, pyloc "Shelves Setback")
+	local shelves_setback = dialog:create_text_box(2, pyui.format_length(data.setback_shelves))
 	
 	dialog:create_label(3, pyloc "Horizontal Rail Width")
 	local width_rail = dialog:create_text_box(4, pyui.format_length(data.width_rail))
 	dialog:create_label(3, pyloc "Vertical Rail Width")
 	local width_vertical_rail = dialog:create_text_box(4, pyui.format_length(data.width_vertical_rail))
-	dialog:create_label(3, pyloc "Shelves Tolerance")
+	dialog:create_label(3, pyloc "Shelf Tolerance")
 	local shelf_gap = dialog:create_text_box(4, pyui.format_length(data.shelf_gap))
-	dialog:create_label(3, pyloc "Shelves Setback")
-	local shelves_setback = dialog:create_text_box(4, pyui.format_length(data.setback_shelves))
-	dialog:create_label(3, pyloc "Shelves Setback")
-	local shelves_setback = dialog:create_text_box(4, pyui.format_length(data.setback_shelves))
-	local button_create_symbols = dialog:create_check_box({3,4}, pyloc "Create Drawing Symbols")
-	button_create_symbols:set_control_checked(data.drawing_symbols)
+
 	dialog:create_align({1,4})
 	dialog:create_group_box({1,2}, pyloc "Benchtop")
 	dialog:create_label(1, pyloc "Benchtop Thickness")
@@ -224,6 +169,8 @@ function settings_dialog(dialog, data)
 	local layer_button = dialog:create_button({1,2}, pyloc "Element Names and Settings")
 
 	local ok = dialog:create_ok_button({3,4})
+--	local cancel = dialog:create_cancel_button(2)
+--	dialog:equalize_column_widths({1,2})
 	
 	bt_thick:set_on_change_handler(function(text)
 		data.benchtop_thickness = math.max(pyui.parse_length(text) or data.benchtop_thickness, 0)
@@ -262,7 +209,7 @@ function settings_dialog(dialog, data)
 		local old_general_height_base = data.general_height_base
 		data.general_height_base = math.max(pyui.parse_length(text) or data.general_height_base, 0)
 		for i,spec_data in pairs(data.cabinet_list) do
-			if spec_data.aux_values.row ~= 0x2 and spec_data.height == old_general_height_base then
+			if spec_data.row ~= 0x2 and spec_data.height == old_general_height_base then
 				spec_data.height = data.general_height_base
 			end
 		end
@@ -343,11 +290,6 @@ function settings_dialog(dialog, data)
 	layer_button:set_on_click_handler(function() 
 		open_layer_dialog(data)
 	end)
-	
-	button_create_symbols:set_on_click_handler(function(state) 
-		data.drawing_symbols = state
-		recreate_all(data, true)
-	end)
 end
 
 
@@ -371,36 +313,31 @@ function handle_dialog(dialog, data)
 	type_combo:insert_control_item(pyloc "No Handle")
 	type_combo:insert_control_item(pyloc "Handle")
 	type_combo:insert_control_item(pyloc "Knob")
-	type_combo:insert_control_item(pyloc "From library")
 --	type_combo:insert_control_item(pyloc "Fingerpull")
 	type_combo:set_control_selection(data.handle_type)
 
 --	dialog:create_group_box({1,2}, pyloc "Doors")
-	controls.ori_combo_label = dialog:create_label(1, pyloc "Handle orientation")
-	controls.ori_combo = dialog:create_drop_list(2)
-	controls.ori_combo:reset_content()
+	dialog:create_label(1, pyloc "Handle orientation")
+	ori_combo = dialog:create_drop_list(2)
+	ori_combo:reset_content()
 	local current_number = 0
-	controls.ori_combo:insert_control_item(pyloc "Vertical")
-	controls.ori_combo:insert_control_item(pyloc "Horizontal")
-	controls.ori_combo:insert_control_item(pyloc "Horizontal, centered")
+	ori_combo:insert_control_item(pyloc "Vertical")
+	ori_combo:insert_control_item(pyloc "Horizontal")
+	ori_combo:insert_control_item(pyloc "Horizontal, centered")
 	
-	controls.ori_combo:set_control_selection(data.handle_position)
+	ori_combo:set_control_selection(data.handle_position)
 --	dialog:end_group_box()
 	
 	dialog:create_group_box({1,2}, pyloc "Distance from edge")
-	controls.handle_dist_vert_label = dialog:create_label(1, pyloc "Vertical")
-	controls.handle_dist_vert = dialog:create_text_box(2, pyui.format_length(data.handle_dist_vert))
-	controls.handle_dist_hori_label = dialog:create_label(1, pyloc "Horizontal")
-	controls.handle_dist_hori = dialog:create_text_box(2, pyui.format_length(data.handle_dist_hori))
+	dialog:create_label(1, pyloc "Vertical")
+	local handle_dist_vert = dialog:create_text_box(2, pyui.format_length(data.handle_dist_vert))
+	dialog:create_label(1, pyloc "Horizontal")
+	local handle_dist_hori = dialog:create_text_box(2, pyui.format_length(data.handle_dist_hori))
 	dialog:end_group_box()
 
-	controls.handle_length_label = dialog:create_label(1, pyloc "Handle length")
-	controls.handle_length = dialog:create_text_box(2, pyui.format_length(data.handle_length))
+	dialog:create_label(1, pyloc "Handle length")
+	local handle_length = dialog:create_text_box(2, pyui.format_length(data.handle_length))
 
-	dialog:create_group_box({1,2}, pyloc "Handle from library")
-	controls.handle_file = dialog:create_button({1,2}, pyloc "Browse")
-
-	dialog:end_group_box()
 	dialog:end_group_box()
 	
 	dialog:create_group_box({3,4}, pyloc "Front Panels")
@@ -413,17 +350,13 @@ function handle_dialog(dialog, data)
 	end
 	panel_type_combo:set_control_selection(math.max(1, math.min(data.panel_type, #panel_options)))
 
-	controls.door_thickness_label = dialog:create_label(3, pyloc "Front Thickness")
+	dialog:create_label(3, pyloc "Front Thickness")
 	controls.door_thickness = dialog:create_text_box(4, pyui.format_length(data.door_thickness))
 	controls.panel_frame_width_label = dialog:create_label(3, pyloc "Frame Width")
 	controls.panel_frame_width = dialog:create_text_box(4, pyui.format_length(data.panel_frame_width))
 	controls.panel_central_thickness_label = dialog:create_label(3, pyloc "Central panel thickness")
 	controls.panel_central_thickness = dialog:create_text_box(4, pyui.format_length(data.panel_central_thickness))
 
-	dialog:create_group_box({3,4}, pyloc "Panel from library")
-	controls.panel_file = dialog:create_button({3,4}, pyloc "Browse")
-
-	dialog:end_group_box()
 
 	dialog:end_group_box()
 
@@ -433,10 +366,7 @@ function handle_dialog(dialog, data)
 
 	
 	panel_type_combo:set_on_change_handler(function(text, new_index)
-		data.panel_type = new_index	
-		if data.panel_type == 4 and data.default_folders.panel_folder == nil then 	--index in array in door_and_handle.
-			browse_front(data)
-		end
+		data.panel_type = new_index
 		update_handle_ui(data, controls)
 		recreate_all(data, false)
 	end)
@@ -458,140 +388,38 @@ function handle_dialog(dialog, data)
 	
 	type_combo:set_on_change_handler(function(text, new_index)
 		data.handle_type = new_index
-		if data.handle_type == 4 and data.default_folders.handle_folder == nil then 
-			browse_handle(data)
-		end
-		update_handle_ui(data, controls)
 		recreate_all(data, true)
 	end)
-	controls.ori_combo:set_on_change_handler(function(text, new_index)
+	ori_combo:set_on_change_handler(function(text, new_index)
 		data.handle_position = new_index
 		recreate_all(data, true)
 	end)
-	controls.handle_length:set_on_change_handler(function(text)
+	handle_length:set_on_change_handler(function(text)
 		data.handle_length = math.max(pyui.parse_length(text) or data.handle_length, 0)
 		recreate_all(data, true)
 	end)
-	controls.handle_dist_vert:set_on_change_handler(function(text)
+	handle_dist_vert:set_on_change_handler(function(text)
 		data.handle_dist_vert = math.max(pyui.parse_length(text) or data.handle_dist_vert, 0)
 		recreate_all(data, true)
 	end)
-	controls.handle_dist_hori:set_on_change_handler(function(text)
+	handle_dist_hori:set_on_change_handler(function(text)
 		data.handle_dist_hori = math.max(pyui.parse_length(text) or data.handle_dist_hori, 0)
 		recreate_all(data, true)
-	end)
-	
-	controls.handle_file:set_on_click_handler(function(state)
-		browse_handle(data)
-		update_handle_ui(data, controls)
-		recreate_all(data, false)
-	end)
-	
-	controls.panel_file:set_on_click_handler(function(state)
-		browse_front(data)
-		update_handle_ui(data, controls)
-		recreate_all(data, false)
 	end)
 
 	update_handle_ui(data, controls)
 end
 
-function browse_handle(data)
-	local result_path = pyux.select_pyo(data.default_folders.handle_folder)
-	if result_path ~= nil then 
-		data.default_folders.handle_folder = result_path
-	end
-end
-function browse_front(data)
-	local result_path = pyux.select_pyo(data.default_folders.panel_folder)
-	if result_path ~= nil then 
-		data.default_folders.panel_folder = result_path
-	end
-end
-
 function update_handle_ui(data, controls)
-	controls.panel_file:disable_control()
-	controls.door_thickness_label:enable_control()
-	controls.door_thickness:enable_control()
 	if data.panel_type == 1 then 
 		controls.panel_frame_width_label:disable_control()
 		controls.panel_frame_width:disable_control()
 		controls.panel_central_thickness_label:disable_control()
 		controls.panel_central_thickness:disable_control()
-	elseif data.panel_type == 4 then 
-		controls.panel_file:enable_control()
-		controls.panel_frame_width_label:disable_control()
-		controls.panel_frame_width:disable_control()
-		controls.panel_central_thickness_label:disable_control()
-		controls.panel_central_thickness:disable_control()
-		controls.door_thickness_label:disable_control()
-		controls.door_thickness:disable_control()
-		--now update the front thickness
-		local panel_group = nil
-		local panel_parts = nil
-		if data.panel_type == 4 and data.default_folders.panel_folder then
-			depth = 0
-			panel_group, ref_point_coos, panel_parts = load_front_panel(data, 600, 600)
-			if panel_group == nil or ref_point_coos == nil then return end
-			if #ref_point_coos > 3 then 
-				data.door_thickness = PYTHAGORAS(ref_point_coos[4][1] - ref_point_coos[1][1], ref_point_coos[4][2] - ref_point_coos[1][2], ref_point_coos[4][3] - ref_point_coos[1][3])
-			end
-			pytha.delete_element(panel_parts)
-			controls.door_thickness:set_control_text(pyui.format_length(data.door_thickness)) 
-		end
-
 	else 
 		controls.panel_frame_width_label:enable_control()
 		controls.panel_frame_width:enable_control()
 		controls.panel_central_thickness_label:enable_control()
 		controls.panel_central_thickness:enable_control()
 	end
-	controls.handle_file:disable_control()
-	controls.handle_dist_hori_label:disable_control()
-	controls.handle_dist_hori:disable_control()
-	controls.handle_dist_vert_label:disable_control()
-	controls.handle_dist_vert:disable_control()
-	controls.handle_length_label:disable_control()
-	controls.handle_length:disable_control()
-	controls.ori_combo_label:disable_control()
-	controls.ori_combo:disable_control()
-	if data.handle_type == 2 then 
-		controls.handle_dist_hori_label:enable_control()
-		controls.handle_dist_hori:enable_control()
-		controls.handle_dist_vert_label:enable_control()
-		controls.handle_dist_vert:enable_control()
-		controls.handle_length_label:enable_control()
-		controls.handle_length:enable_control()
-		controls.ori_combo_label:enable_control()
-		controls.ori_combo:enable_control()
-	elseif data.handle_type == 3 then 
-		controls.handle_dist_hori_label:enable_control()
-		controls.handle_dist_hori:enable_control()
-		controls.handle_dist_vert_label:enable_control()
-		controls.handle_dist_vert:enable_control()
-		controls.ori_combo_label:enable_control()
-		controls.ori_combo:enable_control()
-	elseif data.handle_type == 4 then 
-		controls.handle_file:enable_control()
-		controls.handle_dist_hori_label:enable_control()
-		controls.handle_dist_hori:enable_control()
-		controls.handle_dist_vert_label:enable_control()
-		controls.handle_dist_vert:enable_control()
-		controls.ori_combo_label:enable_control()
-		controls.ori_combo:enable_control()
-
-	end
-	local handle_name = pyloc "Browse"
-	if data.default_folders.handle_folder ~= nil then 
-		handle_name = data.default_folders.handle_folder:get_name()
-		handle_name = string.sub(handle_name, 1, -5)	--remove the last four characters (".pyo").
-	end
-	controls.handle_file:set_control_text(handle_name)
-
-	local panel_name = pyloc "Browse"
-	if data.default_folders.panel_folder ~= nil then 
-		panel_name = data.default_folders.panel_folder:get_name()
-		panel_name = string.sub(panel_name, 1, -5)	--remove the last four characters (".pyo").
-	end
-	controls.panel_file:set_control_text(panel_name)
 end

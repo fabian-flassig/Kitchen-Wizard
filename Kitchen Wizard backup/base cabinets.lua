@@ -11,28 +11,26 @@ function recreate_plan_details_base(general_data, specific_data, cur_elements)
 		door_to_carcass = - general_data.door_thickness - general_data.door_carcass_gap
 	end
 	
-	if general_data.drawing_symbols == true then 
-		new_elem = pytha.create_polyline("open", {{loc_origin[1], loc_origin[2], loc_origin[3]}, 
-											{loc_origin[1], loc_origin[2] - specific_data.depth + door_to_carcass, loc_origin[3]},
-											{loc_origin[1] + specific_data.width, loc_origin[2] - specific_data.depth + door_to_carcass, loc_origin[3]},
-											{loc_origin[1] + specific_data.width, loc_origin[2], loc_origin[3]}})
-		set_part_attributes(new_elem, "floor_plan")
-		table.insert(plan_elements, new_elem)
-		plan_elements = pytha.create_group(plan_elements, {name = attribute_list["floor_plan"].name})
-		table.insert(cur_elements, plan_elements)
-	end
+	new_elem = pytha.create_polyline("open", {{loc_origin[1], loc_origin[2], loc_origin[3]}, 
+										{loc_origin[1], loc_origin[2] - specific_data.depth + door_to_carcass, loc_origin[3]},
+										{loc_origin[1] + specific_data.width, loc_origin[2] - specific_data.depth + door_to_carcass, loc_origin[3]},
+										{loc_origin[1] + specific_data.width, loc_origin[2], loc_origin[3]}})
+	set_part_attributes(new_elem, "floor_plan")
+	table.insert(plan_elements, new_elem)
 
 
+	plan_elements = pytha.create_group(plan_elements, {name = attribute_list["floor_plan"].name})
+
+	table.insert(cur_elements, plan_elements)
 end
 
-function create_profile_from_poly(poly_array, height, loc_origin, element_table, part_type_key, row)
+function create_profile_from_poly(poly_array, height, loc_origin, element_table, part_type_key)
 	fla_handle = pytha.create_polygon(poly_array)
 	profile = pytha.create_profile(fla_handle, height)[1]
-	pytha.delete_element(fla_handle)
-	if profile == nil then return end
 	if part_type_key ~= nil then 
-		set_part_attributes(profile, part_type_key, nil, row)
+		set_part_attributes(profile, part_type_key)
 	end
+	pytha.delete_element(fla_handle)
 	pytha.move_element(profile, loc_origin)
 	table.insert(element_table, profile)
 end
@@ -55,7 +53,7 @@ function recreate_back(general_data, specific_data, height, width, carcass_depth
 		back_width = width
 	end
 	if ignore_bottom_setting == nil then 
-		if specific_data.aux_values.row == 0x2 then
+		if specific_data.row == 0x2 then
 			loc_origin[3] = base_height + general_data.thickness - general_data.groove_depth
 			back_height = height - 2 * general_data.thickness + 2 * general_data.groove_depth
 		else
@@ -93,19 +91,11 @@ function recreate_carcass_base(general_data, specific_data, base_height, height,
 		
 	--Left side
 	loc_origin[2] = door_to_carcass
-
-	local side_poly_array = {}
-	local outline = {{{0,0}, {0, side_length}, {side_height, side_length}, {side_height, 0}},{}}
-	table.insert(side_poly_array, outline)
+	new_elem = pytha.create_block(general_data.thickness, side_length, side_height, loc_origin)
 	if specific_data.fingerpull then
 		loc_origin[3] = base_height
 		recreate_fingerpull(general_data, specific_data, width, new_elem, loc_origin)
 	end 
-
-
-	local side_poly = pytha.create_polygon_ex({{loop_points_1, loop_segments_1}, {--[[FINGERPULL HOLES--]]}})
-	new_elem = pytha.create_block(general_data.thickness, side_length, side_height, loc_origin)
-
 	set_part_attributes(new_elem, "end_lh", return_handles)
 	table.insert(carcass_elements, new_elem)
 	--Right side
@@ -133,7 +123,7 @@ function recreate_carcass_base(general_data, specific_data, base_height, height,
 		bottom_width = width
 		loc_origin[1] = 0
 	end
-	if specific_data.aux_values.row == 0x2 then --this will make the bottom and top go all the way to the wall
+	if specific_data.row == 0x2 then --this will make the bottom and top go all the way to the wall
 		bottom_depth = side_length
 		top_depth = side_length
 	else
@@ -198,15 +188,14 @@ end
 
 
 function create_straight_kickboard(general_data, specific_data, base_height, width, cur_elements)
-	specific_data.aux_values.kickboard_handle_left = pytha.create_block(width, general_data.kickboard_thickness, base_height - general_data.kickboard_margin, {0, general_data.kickboard_setback, general_data.kickboard_margin})
-	set_part_attributes(specific_data.aux_values.kickboard_handle_left, "kickboard")
-	table.insert(cur_elements, specific_data.aux_values.kickboard_handle_left)
-	specific_data.aux_values.kickboard_handle_right = specific_data.aux_values.kickboard_handle_left
+	specific_data.kickboard_handle_left = pytha.create_block(width, general_data.kickboard_thickness, base_height - general_data.kickboard_margin, {0, general_data.kickboard_setback, general_data.kickboard_margin})
+	table.insert(cur_elements, specific_data.kickboard_handle_left)
+	specific_data.kickboard_handle_right = specific_data.kickboard_handle_left
 end
 
 function create_straight_benchtop(general_data, specific_data, width)
 	local benchtop = pytha.create_rectangle(width, general_data.top_over + specific_data.depth, {0, -general_data.top_over, general_data.benchtop_height - general_data.benchtop_thickness})
-	specific_data.aux_values.elem_handle_for_top = pytha.create_profile(benchtop, general_data.benchtop_thickness)[1]
+	specific_data.elem_handle_for_top = pytha.create_profile(benchtop, general_data.benchtop_thickness)[1]
 	pytha.delete_element(benchtop)
 end
 
@@ -236,13 +225,13 @@ end
 function get_cabinet_row_height_base_height(general_data, specific_data)
 	local base_height = 0
 	local height = 0
-	if specific_data.aux_values.row == 0x1 then 
+	if specific_data.row == 0x1 then 
 		base_height = general_data.benchtop_height - specific_data.height - general_data.benchtop_thickness 
 		height = specific_data.height
-	elseif specific_data.aux_values.row == 0x2 then 
+	elseif specific_data.row == 0x2 then 
 		base_height = general_data.wall_to_base_spacing + general_data.benchtop_height
 		height = specific_data.height_top - base_height
-	elseif specific_data.aux_values.row == 0x3 then 
+	elseif specific_data.row == 0x3 then 
 		base_height = general_data.benchtop_height - general_data.general_height_base - general_data.benchtop_thickness
 		height = specific_data.height_top - base_height
 	end
@@ -256,6 +245,7 @@ local function recreate_carcass(general_data, specific_data, cur_elements)
 	local base_height = general_data.benchtop_height - specific_data.height - general_data.benchtop_thickness
 	--if the kitchen is L-shaped. The angle is inherited from the previous cabinet
 	local coordinate_system = {{1, 0, 0}, {0, 1, 0}, {0,0,1}}
+	local loc_origin = {0, 0, base_height}
 	local carcass_depth = specific_data.depth - door_to_carcass
 	local groove_dist_back_off = groove_dist_back_off_calc(general_data, specific_data)
 	local carcass_elements = {}
@@ -289,15 +279,15 @@ local function recreate_base(general_data, specific_data)
 	recreate_carcass(general_data, specific_data, cur_elements)
 
 	
-	specific_data.aux_values.main_group = pytha.create_group(cur_elements)
-	return specific_data.aux_values.main_group
+	specific_data.main_group = pytha.create_group(cur_elements)
+	return specific_data.main_group
 end
 
 function placement_base(general_data, specific_data)
-	specific_data.aux_values.right_connection_point = {specific_data.width, specific_data.depth,0}
-	specific_data.aux_values.left_connection_point = {0, specific_data.depth,0}
-	specific_data.aux_values.right_direction = 0
-	specific_data.aux_values.left_direction = 0
+	specific_data.right_connection_point = {specific_data.width, specific_data.depth,0}
+	specific_data.left_connection_point = {0, specific_data.depth,0}
+	specific_data.right_direction = 0
+	specific_data.left_direction = 0
 end
 
 local function ui_update_base(general_data, soft_update)
@@ -311,43 +301,10 @@ local function ui_update_base(general_data, soft_update)
 end
 
 
---Sink cabinet 
+--Sink (or hob) cabinet 
 local function recreate_sink(general_data, specific_data)
 
 	local cur_elements = {}
-	local door_to_carcass = - general_data.door_carcass_gap
-	if specific_data.front_style == "base_open" then
-		door_to_carcass = - general_data.door_thickness - general_data.door_carcass_gap
-	end
-	
-	recreate_carcass(general_data, specific_data, cur_elements)
-	
-
-	local base_height = general_data.benchtop_height - specific_data.height - general_data.benchtop_thickness
-	local loc_origin = {0, 0, base_height}
-
---------------------
-	local loaded_sink = create_sink(general_data, specific_data, specific_data.appliance_file) 
-	table.insert(cur_elements, loaded_sink)
---------------------	
-	loc_origin[1] = general_data.thickness
-	if specific_data.door_rh == true then
-		loc_origin[1] = specific_data.width - general_data.thickness
-	end
-	loc_origin[2] = door_to_carcass
-	loc_origin[3] = base_height + general_data.thickness
-	local loaded_appliance = create_garbage_bin(general_data, specific_data, specific_data.appliance_file2, loc_origin) 
-	table.insert(cur_elements, loaded_appliance)
-	--------------------	
-	
-	specific_data.aux_values.main_group = pytha.create_group(cur_elements)
-	return specific_data.aux_values.main_group
-end
-
---Hob cabinet 
-local function recreate_hob(general_data, specific_data)
-
-	local cur_elements = {}
 	
 	recreate_carcass(general_data, specific_data, cur_elements)
 	
@@ -360,8 +317,8 @@ local function recreate_hob(general_data, specific_data)
 	table.insert(cur_elements, loaded_sink)
 --------------------	
 	
-	specific_data.aux_values.main_group = pytha.create_group(cur_elements)
-	return specific_data.aux_values.main_group
+	specific_data.main_group = pytha.create_group(cur_elements)
+	return specific_data.main_group
 end
 
 
@@ -372,21 +329,13 @@ local function recreate_empty(general_data, specific_data)
 	
 	--Benchtop
 	local benchtop = pytha.create_rectangle(specific_data.width, general_data.top_over + specific_data.depth, {0, -general_data.top_over, general_data.benchtop_height - general_data.benchtop_thickness})
-	specific_data.aux_values.elem_handle_for_top = pytha.create_profile(benchtop, general_data.benchtop_thickness)[1]
+	specific_data.elem_handle_for_top = pytha.create_profile(benchtop, general_data.benchtop_thickness)[1]
 	pytha.delete_element(benchtop)
 
 --	recreate_plan_details_base(general_data, specific_data, cur_elements)
 
-	specific_data.aux_values.main_group = pytha.create_group(cur_elements)
-	return specific_data.aux_values.main_group
-end
---Empty space on wall
-local function recreate_empty_wall(general_data, specific_data)
-
-	local cur_elements = {}
-
-	specific_data.aux_values.main_group = pytha.create_group(cur_elements)
-	return specific_data.aux_values.main_group
+	specific_data.main_group = pytha.create_group(cur_elements)
+	return specific_data.main_group
 end
 	
 local function ui_update_sink(general_data, soft_update)
@@ -401,11 +350,7 @@ local function ui_update_sink(general_data, soft_update)
 	controls.appliance_model_label:show_control()
 	controls.appliance_model_label:set_control_text(pyloc "Sink model")
 	controls.appliance_model:show_control()
-	appl_to_front_styles(general_data, specific_data, false, "sink_folder", pyloc "No sink")
-	controls.appliance_model2_label:show_control()
-	controls.appliance_model2_label:set_control_text(pyloc "Garbage bin model")
-	controls.appliance_model2:show_control()
-	appl_to_front_styles2(general_data, specific_data, false, "garbage_bin_folder", pyloc "No garbage bin")
+	sinks_to_front_styles(general_data, specific_data, false)
 
 end	
 
@@ -418,6 +363,7 @@ local function recreate_dishwasher_fridge(general_data, specific_data, type)
 	local base_height = general_data.benchtop_height - general_data.benchtop_thickness - specific_data.height 
 	local loc_origin = {0, 0, base_height}
 	local carcass_elements = {}
+
 	new_elem = pytha.create_block(specific_data.width, specific_data.depth, specific_data.height, loc_origin)
 	set_part_attributes(new_elem, type)
 	new_elem = pytha.create_group(new_elem, {name = attribute_list[type].name})
@@ -436,8 +382,8 @@ local function recreate_dishwasher_fridge(general_data, specific_data, type)
 	create_straight_benchtop(general_data, specific_data, specific_data.width)
 	recreate_plan_details_base(general_data, specific_data, cur_elements)
 
-	specific_data.aux_values.main_group = pytha.create_group(cur_elements)
-	return specific_data.aux_values.main_group
+	specific_data.main_group = pytha.create_group(cur_elements)
+	return specific_data.main_group
 end
 local function recreate_dishwasher(general_data, specific_data)
 	
@@ -460,7 +406,7 @@ local function ui_update_hob(general_data, soft_update)
 	controls.appliance_model_label:set_control_text(pyloc "Hob model")
 	controls.appliance_model:show_control()
 
-	appl_to_front_styles(general_data, specific_data, false, "hob_folder", pyloc "No hob")
+	hobs_to_front_styles(general_data, specific_data, false)
 
 end
 local function ui_update_empty(general_data, soft_update)
@@ -498,7 +444,7 @@ end
 
 cabinet_typelist.base = 					--used to reference the cabinet in the list
 {									
-	name = pyloc "Base",			--displayed in drop List and used as group name
+	name = pyloc "Base cabinet",			--displayed in drop List and used as group name
 	row = 0x1,									--0x1 base, 0x2 wall, 0x3 high (high covers both rows)
 	default_data = {width = 600,
 					top_style = "top_horizontal",}, 				--default data that is set to individual values			
@@ -523,7 +469,7 @@ cabinet_typelist.base = 					--used to reference the cabinet in the list
 
 cabinet_typelist.sink = 			
 {									
-	name = pyloc "Sink",		
+	name = pyloc "Sink cabinet",		
 	row = 0x1,							
 	default_data = function(general_data, specific_data) specific_data.width = 600
 														specific_data.shelf_count = 0
@@ -531,7 +477,6 @@ cabinet_typelist.sink =
 														specific_data.sink_flipped = 0
 														specific_data.sink_position = 2 --1: left, 2: center, 3: right	 
 														specific_data.appliance_file = general_data.default_folders.sink_folder 
-														specific_data.appliance_file2 = general_data.default_folders.garbage_bin_folder 
 														end,		
 	geometry_function = recreate_sink,	 
 	placement_function = placement_base, 	
@@ -552,14 +497,14 @@ cabinet_typelist.sink =
 
 cabinet_typelist.hob = 			
 {									
-	name = pyloc "Hob",		
+	name = pyloc "Hob cabinet",		
 	row = 0x1,							
 	default_data = function(general_data, specific_data) specific_data.width = 600
 														specific_data.sink_flipped = 0
 														specific_data.sink_position = 2 --1: left, 2: center, 3: right	 
 														specific_data.appliance_file = general_data.default_folders.hob_folder 
 														end,
-	geometry_function = recreate_hob,	 	--can use the same loading algorithm for the pure hob (which is always centered to the cabinet)	
+	geometry_function = recreate_sink,	 	--can use the same loading algorithm for the pure hob (which is always centered to the cabinet)	
 	placement_function = placement_base, 	
 	ui_update_function = ui_update_hob,
 	organization_styles = {"intelli_doors",	
@@ -604,27 +549,13 @@ cabinet_typelist.dishwasher =
 }
 cabinet_typelist.fridge = 			
 {									
-	name = pyloc "Low fridge",		
+	name = pyloc "Low fridge cabinet",		
 	row = 0x1,							
 	default_data = {width = 600, depth2 = 0},
 	geometry_function = recreate_fridge,	 	--can use the same loading algorithm for the pure hob (which is always centered to the cabinet)	
 	placement_function = placement_base, 	
 	ui_update_function = ui_update_fridge,
 	organization_styles = {"single_door",},
-	back_styles = {},
-	bottom_styles = {},
-	top_styles = {},
-}
-
-cabinet_typelist.empty_wall = 			
-{									
-	name = pyloc "Wall Empty",		
-	row = 0x2,							
-	default_data = {width = 600,},
-	geometry_function = recreate_empty_wall,	 	--can use the same loading algorithm for the pure hob (which is always centered to the cabinet)	
-	placement_function = placement_base, 	
-	ui_update_function = ui_update_empty,
-	organization_styles = {},	
 	back_styles = {},
 	bottom_styles = {},
 	top_styles = {},

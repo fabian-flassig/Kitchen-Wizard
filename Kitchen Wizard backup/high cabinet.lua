@@ -4,7 +4,7 @@
 
 local function recreate_high(general_data, specific_data)
 	
-	specific_data.aux_values.elem_handle_for_top = nil
+	specific_data.elem_handle_for_top = nil
 	
 	local door_to_carcass = door_carcass_calc(general_data, specific_data)
 	local base_height = general_data.benchtop_height - general_data.general_height_base - general_data.benchtop_thickness
@@ -50,12 +50,12 @@ local function recreate_high(general_data, specific_data)
 	create_straight_kickboard(general_data, specific_data, base_height, specific_data.width, cur_elements)
 	recreate_plan_details_base(general_data, specific_data, cur_elements)
 	
-	specific_data.aux_values.main_group = pytha.create_group(cur_elements)
-	return specific_data.aux_values.main_group
+	specific_data.main_group = pytha.create_group(cur_elements)
+	return specific_data.main_group
 end
 local function recreate_high_appl1(general_data, specific_data)
 	
-	specific_data.aux_values.elem_handle_for_top = nil
+	specific_data.elem_handle_for_top = nil
 	
 	local door_to_carcass = door_carcass_calc(general_data, specific_data)
 	local base_height = general_data.benchtop_height - general_data.general_height_base - general_data.benchtop_thickness
@@ -116,12 +116,12 @@ local function recreate_high_appl1(general_data, specific_data)
 	create_straight_kickboard(general_data, specific_data, base_height, specific_data.width, cur_elements)
 	recreate_plan_details_base(general_data, specific_data, cur_elements)
 	
-	specific_data.aux_values.main_group = pytha.create_group(cur_elements)
-	return specific_data.aux_values.main_group
+	specific_data.main_group = pytha.create_group(cur_elements)
+	return specific_data.main_group
 end
 local function recreate_high_appl2(general_data, specific_data)
 	
-	specific_data.aux_values.elem_handle_for_top = nil
+	specific_data.elem_handle_for_top = nil
 	
 	local door_to_carcass = door_carcass_calc(general_data, specific_data)
 	local base_height = general_data.benchtop_height - general_data.general_height_base - general_data.benchtop_thickness
@@ -153,10 +153,10 @@ local function recreate_high_appl2(general_data, specific_data)
 	loc_origin[1] = 0
 	loc_origin[2] = general_data.setback_fixed_shelves
 	loc_origin[3] = base_height + specific_data.height - general_data.thickness
-	new_elem = create_fixed_shelf(general_data, specific_data, specific_data.width, shelf_depth - general_data.setback_fixed_shelves, loc_origin)
+	new_elem = create_fixed_shelf(general_data, specific_data, specific_data.width, shelf_depth, loc_origin)
 	table.insert(carcass_elements, new_elem)
 	loc_origin[3] = base_height + specific_data.height + oven_height + (general_data.gap - general_data.thickness) / 2
-	new_elem = create_fixed_shelf(general_data, specific_data, specific_data.width, shelf_depth - general_data.setback_fixed_shelves, loc_origin)
+	new_elem = create_fixed_shelf(general_data, specific_data, specific_data.width, shelf_depth, loc_origin)
 	table.insert(carcass_elements, new_elem)
 	--Microwave
 	local microwave_bottom = base_height + specific_data.height + oven_height + general_data.top_gap
@@ -167,13 +167,10 @@ local function recreate_high_appl2(general_data, specific_data)
 	if specific_data.appliance_file2 then 
 		loaded_oven, oven_width, microwave_height = create_oven_with_blind(general_data, specific_data, specific_data.appliance_file2, loc_origin, shelf_depth, cur_elements, carcass_elements, "bottom")
 	end 
-	loc_origin[1] = 0
-	loc_origin[2] = general_data.setback_fixed_shelves
 	loc_origin[3] = microwave_bottom + microwave_height + (general_data.gap - general_data.thickness) / 2
-	new_elem = create_fixed_shelf(general_data, specific_data, specific_data.width, shelf_depth - general_data.setback_fixed_shelves, loc_origin)
+	new_elem = create_fixed_shelf(general_data, specific_data, specific_data.width, shelf_depth, loc_origin)
 	table.insert(carcass_elements, new_elem)
 	
-	loc_origin[3] = microwave_bottom + microwave_height + general_data.top_gap
 
 	local base_top_back = loc_origin[3]
 	--Lower Back
@@ -194,13 +191,13 @@ local function recreate_high_appl2(general_data, specific_data)
 	create_straight_kickboard(general_data, specific_data, base_height, specific_data.width, cur_elements)
 	recreate_plan_details_base(general_data, specific_data, cur_elements)
 	
-	specific_data.aux_values.main_group = pytha.create_group(cur_elements)
-	return specific_data.aux_values.main_group
+	specific_data.main_group = pytha.create_group(cur_elements)
+	return specific_data.main_group
 end
 
 local function recreate_high_fridge(general_data, specific_data)
 	
-	specific_data.aux_values.elem_handle_for_top = nil
+	specific_data.elem_handle_for_top = nil
 	
 	local door_to_carcass = door_carcass_calc(general_data, specific_data)
 	local base_height = general_data.benchtop_height - general_data.general_height_base - general_data.benchtop_thickness
@@ -387,23 +384,24 @@ local function recreate_high_fridge(general_data, specific_data)
 
 	carcass_elements = pytha.create_group(carcass_elements, {name = attribute_list["carcass"].name})	
 	table.insert(cur_elements, carcass_elements)
+
 	--Kickboard
 	local kickboard_height = base_height
 	if gap_in_kickboard == true then 
-		kickboard_height = base_height - specific_data.groove_dist
+		kickboard_height = base_height - specific_data.groove_dist + general_data.kickboard_margin
 	end
 	create_straight_kickboard(general_data, specific_data, kickboard_height, specific_data.width, cur_elements)
 	recreate_plan_details_base(general_data, specific_data, cur_elements)
 	
-	specific_data.aux_values.main_group = pytha.create_group(cur_elements)
-	return specific_data.aux_values.main_group
+	specific_data.main_group = pytha.create_group(cur_elements)
+	return specific_data.main_group
 end
 
 local function placement_high(general_data, specific_data)
-	specific_data.aux_values.right_connection_point = {specific_data.width, specific_data.depth,0}
-	specific_data.aux_values.left_connection_point = {0, specific_data.depth,0}
-	specific_data.aux_values.right_direction = 0
-	specific_data.aux_values.left_direction = 0
+	specific_data.right_connection_point = {specific_data.width, specific_data.depth,0}
+	specific_data.left_connection_point = {0, specific_data.depth,0}
+	specific_data.right_direction = 0
+	specific_data.left_direction = 0
 end
 
 local function ui_update_high(general_data, soft_update)
@@ -431,7 +429,7 @@ local function ui_update_high_appl1(general_data, soft_update)
 	controls.appliance_model:show_control()
 
 	local specific_data = general_data.cabinet_list[general_data.current_cabinet]
-	appl_to_front_styles(general_data, specific_data, false, "oven_model", pyloc "No oven")
+	ovens_to_front_styles1(general_data, specific_data, false)
 end
 
 local function ui_update_high_fridge(general_data, soft_update)
@@ -454,7 +452,7 @@ local function ui_update_high_fridge(general_data, soft_update)
 	controls.appliance_model:show_control()
 
 	local specific_data = general_data.cabinet_list[general_data.current_cabinet]
-	appl_to_front_styles(general_data, specific_data, false, "fridge_folder", pyloc "No fridge")
+	fridges_to_front_styles1(general_data, specific_data, false)
 
 end
 local function ui_update_high_appl2(general_data, soft_update)
@@ -469,7 +467,7 @@ local function ui_update_high_appl2(general_data, soft_update)
 	controls.appliance_model2:show_control()
 
 	local specific_data = general_data.cabinet_list[general_data.current_cabinet]
-	appl_to_front_styles2(general_data, specific_data, false, "microwave_folder", pyloc "No 2nd applicance")
+	ovens_to_front_styles2(general_data, specific_data, false)
 
 end
 
@@ -480,7 +478,7 @@ if cabinet_typelist == nil then
 end
 cabinet_typelist.high = 				
 {									
-	name = pyloc "High",
+	name = pyloc "High cabinet",
 	row = 0x3,
 	default_data = {width = 600,},
 	geometry_function = recreate_high,
@@ -488,9 +486,7 @@ cabinet_typelist.high =
 	ui_update_function = ui_update_high,
 	organization_styles = {"split_drawers_intelli_doors", 
 							"split_intelli_doors_doors",
-							"drawers",	
-							"intelli_doors", 
-							"open"},
+							"intelli_doors"},
 	back_styles = {"back_internal", 
 					"back_external", 
 					"back_rebate",},
@@ -500,11 +496,12 @@ cabinet_typelist.high =
 }
 cabinet_typelist.high_appliance1 = 				
 {									
-	name = pyloc "High oven",
+	name = pyloc "High oven cabinet",
 	row = 0x3,
 	default_data = function(general_data, specific_data) specific_data.width = 600 
 														specific_data.depth2 = 30 
 														specific_data.appliance_file = general_data.default_folders.oven_folder  
+														specific_data.appliance_file2 = general_data.default_folders.microwave_folder  
 														specific_data.shelf_count = 1
 														specific_data.drawer_count = 3 end,
 	geometry_function = recreate_high_appl1,
@@ -521,7 +518,7 @@ cabinet_typelist.high_appliance1 =
 }
 cabinet_typelist.high_appliance2 = 				
 {									
-	name = pyloc "High oven&microwave",
+	name = pyloc "High oven&microwave cabinet",
 	row = 0x3,
 	default_data = function(general_data, specific_data) specific_data.width = 600 
 														specific_data.depth2 = 30 
@@ -543,7 +540,7 @@ cabinet_typelist.high_appliance2 =
 }
 cabinet_typelist.high_fridge = 				
 {									
-	name = pyloc "High fridge",
+	name = pyloc "High fridge cabinet",
 	row = 0x3,
 	default_data = function(general_data, specific_data) specific_data.width = 600 
 														specific_data.depth2 = 30 

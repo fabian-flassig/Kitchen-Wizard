@@ -38,16 +38,16 @@ local function recreate_hood(general_data, specific_data)
 	set_part_attributes(new_elem, "light")
 	table.insert(cur_elements, new_elem)
 	
-	specific_data.aux_values.main_group = pytha.create_group(cur_elements)
+	specific_data.main_group = pytha.create_group(cur_elements)
 	
-	return specific_data.aux_values.main_group
+	return specific_data.main_group
 end
 
 local function placement_hood(general_data, specific_data)
-	specific_data.aux_values.right_connection_point = {specific_data.width, depth,0}
-	specific_data.aux_values.left_connection_point = {0, depth,0}
-	specific_data.aux_values.right_direction = 0
-	specific_data.aux_values.left_direction = 0
+	specific_data.right_connection_point = {specific_data.width, depth,0}
+	specific_data.left_connection_point = {0, depth,0}
+	specific_data.right_direction = 0
+	specific_data.left_direction = 0
 end
 
 

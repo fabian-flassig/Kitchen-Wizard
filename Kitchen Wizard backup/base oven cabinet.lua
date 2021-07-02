@@ -134,7 +134,8 @@ local function recreate_hob_and_oven_base(general_data, specific_data, cur_eleme
 	
 
 
-	carcass_elements = pytha.create_group(carcass_elements, {name = attribute_list["carcass"].name})	
+	carcass_elements = pytha.create_group(carcass_elements)	
+	pytha.set_element_name(carcass_elements, "Base_Carcass")
 	table.insert(cur_elements, carcass_elements)
 
 	--Kickboard
@@ -160,8 +161,8 @@ local function recreate_hob_and_oven(general_data, specific_data)
 	
 --------------------	
 	
-	specific_data.aux_values.main_group = pytha.create_group(cur_elements)
-	return specific_data.aux_values.main_group
+	specific_data.main_group = pytha.create_group(cur_elements)
+	return specific_data.main_group
 end
 	
 local function ui_update_hob_oven(general_data, soft_update)
@@ -182,8 +183,8 @@ local function ui_update_hob_oven(general_data, soft_update)
 	controls.appliance_model:show_control()
 	
 
-	appl_to_front_styles(general_data, specific_data, false, "hob_folder", pyloc "No hob")
-	appl_to_front_styles2(general_data, specific_data, false, "oven_folder", pyloc "No oven")
+	hobs_to_front_styles(general_data, specific_data, false)
+	ovens_to_front_styles2(general_data, specific_data, false)
 
 end
 	
@@ -194,7 +195,7 @@ end
 
 cabinet_typelist.hob_and_oven = 			
 {									
-	name = pyloc "Hob and oven",		
+	name = pyloc "Hob and oven cabinet",		
 	row = 0x1,							
 	default_data = function(general_data, specific_data) specific_data.width = 600
 														specific_data.sink_flipped = 0

@@ -1,6 +1,5 @@
 --some basic logic for the vertical position of the handles
 function get_handle_v_pos(general_data, specific_data, door_height, origin)
-
 	if 	origin[3] < general_data.benchtop_height / 2 and origin[3] + door_height > 1500 then 
 		return 'benchtop'
 	end
@@ -11,14 +10,14 @@ function get_handle_v_pos(general_data, specific_data, door_height, origin)
 	return 'top'
 end
 
-function create_plain_front(general_data, width, door_thickness, door_height, origin, door_key, row)
+function create_plain_front(general_data, width, door_thickness, door_height, origin, door_key)
 	new_elem = pytha.create_block(width, door_thickness, door_height, origin)
-	set_part_attributes(new_elem, door_key, nil, row)
+	set_part_attributes(new_elem, door_key)
 	
 	local door_group = pytha.create_group(new_elem, {name = attribute_list[door_key].name})
 	return door_group
 end
-function create_frame1_front(general_data, width, door_thickness, door_height, origin, door_key, row)
+function create_frame1_front(general_data, width, door_thickness, door_height, origin, door_key)
 	local frame_width = general_data.panel_frame_width
 	local door_table = {}
 	local central_panel_thickness = general_data.panel_central_thickness
@@ -29,33 +28,33 @@ function create_frame1_front(general_data, width, door_thickness, door_height, o
 
 	local rel_origin = {origin[1] + frame_width, origin[2], origin[3]}
 	new_elem = pytha.create_block(width - 2 * frame_width, door_thickness, frame_width, rel_origin)
-	set_part_attributes(new_elem, door_key, nil, row)
+	set_part_attributes(new_elem, door_key)
 	table.insert(door_table, new_elem)
 
 	rel_origin = {origin[1], origin[2], origin[3]}
 	new_elem = pytha.create_block(frame_width, door_thickness, door_height, rel_origin)
-	set_part_attributes(new_elem, door_key, nil, row)
+	set_part_attributes(new_elem, door_key)
 	table.insert(door_table, new_elem)
 	
 	rel_origin = {origin[1] + width - frame_width, origin[2], origin[3]}
 	new_elem = pytha.create_block(frame_width, door_thickness, door_height, rel_origin)
-	set_part_attributes(new_elem, door_key, nil, row)
+	set_part_attributes(new_elem, door_key)
 	table.insert(door_table, new_elem)
 	
 	rel_origin = {origin[1] + frame_width, origin[2], origin[3] + door_height - frame_width}
 	new_elem = pytha.create_block(width - 2 * frame_width, door_thickness, frame_width, rel_origin)
-	set_part_attributes(new_elem, door_key, nil, row)
+	set_part_attributes(new_elem, door_key)
 	table.insert(door_table, new_elem)
 	
 	rel_origin = {origin[1] + frame_width, origin[2] + door_thickness - central_panel_thickness, origin[3] + frame_width}
 	new_elem = pytha.create_block(width - 2 * frame_width, central_panel_thickness, door_height - 2 * frame_width, rel_origin)
-	set_part_attributes(new_elem, door_key, nil, row)
+	set_part_attributes(new_elem, door_key)
 	table.insert(door_table, new_elem)
 	local door_group = pytha.create_group(door_table, {name = attribute_list[door_key].name})
 	return door_group
 end
 
-function create_frame2_front(general_data, width, door_thickness, door_height, origin, door_key, row)
+function create_frame2_front(general_data, width, door_thickness, door_height, origin, door_key)
 	local frame_width = general_data.panel_frame_width
 	local door_table = {}
 	local central_panel_thickness = general_data.panel_central_thickness
@@ -66,60 +65,30 @@ function create_frame2_front(general_data, width, door_thickness, door_height, o
 
 	local rel_origin = {origin[1], origin[2], origin[3]}
 	new_elem = pytha.create_block(width, door_thickness, frame_width, rel_origin)
-	set_part_attributes(new_elem, door_key, nil, row)
+	set_part_attributes(new_elem, door_key)
 	table.insert(door_table, new_elem)
 
 	rel_origin = {origin[1], origin[2], origin[3] + frame_width}
 	new_elem = pytha.create_block(frame_width, door_thickness, door_height - 2 * frame_width, rel_origin)
-	set_part_attributes(new_elem, door_key, nil, row)
+	set_part_attributes(new_elem, door_key)
 	table.insert(door_table, new_elem)
 	
 	rel_origin = {origin[1] + width - frame_width, origin[2], origin[3] + frame_width}
 	new_elem = pytha.create_block(frame_width, door_thickness, door_height - 2 * frame_width, rel_origin)
-	set_part_attributes(new_elem, door_key, nil, row)
+	set_part_attributes(new_elem, door_key)
 	table.insert(door_table, new_elem)
 	
 	rel_origin = {origin[1], origin[2], origin[3] + door_height - frame_width}
 	new_elem = pytha.create_block(width, door_thickness, frame_width, rel_origin)
-	set_part_attributes(new_elem, door_key, nil, row)
+	set_part_attributes(new_elem, door_key)
 	table.insert(door_table, new_elem)
 	
 	rel_origin = {origin[1] + frame_width, origin[2] + door_thickness - central_panel_thickness, origin[3] + frame_width}
 	new_elem = pytha.create_block(width - 2 * frame_width, central_panel_thickness, door_height - 2 * frame_width, rel_origin)
-	set_part_attributes(new_elem, door_key, nil, row)
+	set_part_attributes(new_elem, door_key)
 	table.insert(door_table, new_elem)
 	local door_group = pytha.create_group(door_table, {name = attribute_list[door_key].name})
 	return door_group
-end
-
-function create_library_front(general_data, width, door_thickness, door_height, origin, door_key, row)
-	local ref_point_coos = {}
-	local panel_group = nil
-	local frame_width = general_data.panel_frame_width
-	
-	--arbitrary constraints to create a flat panel for e.g. small drawers
-	if general_data.default_folders.panel_folder == nil --[[or width < 2 * frame_width + 20 or door_height < 2 * frame_width + 20--]]  then 
-		return create_plain_front(general_data, width, door_thickness, door_height, origin, door_key, row)
-	else
-		depth = 0
-		panel_group, ref_point_coos = load_front_panel(general_data, width, door_height, door_key, row)
-		if panel_group == nil or ref_point_coos == nil then 
-			--fallback plain front
-			return create_plain_front(general_data, width, door_thickness, door_height, origin, door_key, row)
-		end
-		local panel_thickness = 0
-		if #ref_point_coos > 3 then 
-			panel_length = PYTHAGORAS(ref_point_coos[2][1] - ref_point_coos[1][1], ref_point_coos[2][2] - ref_point_coos[1][2], ref_point_coos[2][3] - ref_point_coos[1][3])
-			panel_height = PYTHAGORAS(ref_point_coos[3][1] - ref_point_coos[1][1], ref_point_coos[3][2] - ref_point_coos[1][2], ref_point_coos[3][3] - ref_point_coos[1][3])
-			panel_thickness = PYTHAGORAS(ref_point_coos[4][1] - ref_point_coos[1][1], ref_point_coos[4][2] - ref_point_coos[1][2], ref_point_coos[4][3] - ref_point_coos[1][3])
-		end
-		pytha.move_element(panel_group, {-ref_point_coos[3][1], -ref_point_coos[3][2], -ref_point_coos[3][3]})
-		pytha.move_element(panel_group, {0, panel_thickness, 0})
-		pytha.move_element(panel_group, origin)
-		pytha.set_element_attributes(panel_group, {name = attribute_list[door_key].name})
-	end
-	
-	return panel_group
 end
 
 
@@ -133,25 +102,22 @@ panel_options = {
 	{ name = pyloc "Frame 2",
 		geometry_function = create_frame2_front,
 	},
-	{ name = pyloc "From library",
-		geometry_function = create_library_front,
-	},
 	--here you can add an option e.g. from file
 }
 
-function create_door_panel(general_data, width, door_thickness, door_height, origin, door_key, row)
+function create_door_panel(general_data, width, door_thickness, door_height, origin, door_key)
 	local loc_panel_type = general_data.panel_type
 	if general_data.panel_type == nil or general_data.panel_type < 1 or general_data.panel_type > #panel_options then 
 		loc_panel_type = 1
 	end
-	local new_elem = panel_options[loc_panel_type].geometry_function(general_data, width, door_thickness, door_height, origin, door_key, row)
+	local new_elem = panel_options[loc_panel_type].geometry_function(general_data, width, door_thickness, door_height, origin, door_key)
 	pytha.set_group_replace_properties(new_elem, {origin_u = 'mid', origin_v = 'high', origin_w = 'mid', zoom_u = true, zoom_v = false, zoom_w = true})
 	return new_elem
 end
 
 
 -- Door
-function create_door_tkh(general_data, specific_data, width, height, origin, door_rh, ext_elements, base_origin)
+function create_door_tkh(general_data, specific_data, width, height, origin, door_rh, v_posi_code, ext_elements, base_origin)
 	local loc_origin = {origin[1], origin[2], origin[3]} 	--tables are by reference, so you could overwrite the origin in the calling function. Therefore we assign by value.
 	local door_thickness = general_data.door_thickness
 	local door_height = height
@@ -161,7 +127,7 @@ function create_door_tkh(general_data, specific_data, width, height, origin, doo
 		door_key = "door_lh"
 	end
 
-	new_elem = create_door_panel(general_data, width, door_thickness, door_height, origin, door_key, specific_data.aux_values.row)
+	new_elem = create_door_panel(general_data, width, door_thickness, door_height, origin, door_key)
 
 	local h_posi_code = ''
 	local vertical = false
@@ -169,8 +135,9 @@ function create_door_tkh(general_data, specific_data, width, height, origin, doo
 	if general_data.handle_position == 1 then 
 		vertical = true
 	end
-	v_posi_code = get_handle_v_pos(general_data, specific_data, door_height, base_origin)
-
+	if v_posi_code == nil then
+		v_posi_code = get_handle_v_pos(general_data, specific_data, door_height, base_origin)
+	end
 	if general_data.handle_position == 1 or general_data.handle_position == 2 then 
 		if door_rh == false then	
 			h_posi_code = 'right'
@@ -184,14 +151,14 @@ function create_door_tkh(general_data, specific_data, width, height, origin, doo
 	local door_group = pytha.create_group({handle, new_elem}, {name = attribute_list[door_key].name})
 	local elevation_elem = nil
 	local plan_elem = nil
-	if general_data.drawing_symbols == true then 
-		elevation_elem, plan_elem = create_doorline_tkh(general_data, specific_data, origin, width, door_height, door_rh)
-	end
+	elevation_elem, plan_elem = create_doorline_tkh(general_data, specific_data, origin, width, door_height, door_rh)
 
 	local rp_pos = {origin[1],
 					origin[2] + door_thickness,
 					origin[3] + door_height}
-
+	if specific_data.this_type == "overhead_tkh" then
+		rp_pos[3] = origin[3] + door_height
+	end
 	if door_group ~= nil then
 		pytha.create_element_ref_point(door_group, rp_pos)
 		rp_pos[1] = rp_pos[1] + width
@@ -200,7 +167,9 @@ function create_door_tkh(general_data, specific_data, width, height, origin, doo
 		rp_pos[3] = origin[3]
 		pytha.create_element_ref_point(door_group, rp_pos)
 		rp_pos[3] = origin[3] + door_height
-
+		if specific_data.this_type == "overhead_tkh" then
+			rp_pos[3] = origin[3] + door_height
+		end
 		rp_pos[2] = rp_pos[2] - general_data.door_thickness
 		pytha.create_element_ref_point(door_group, rp_pos)
 	end
@@ -223,7 +192,6 @@ end
 function create_doorline_tkh(general_data, specific_data, origin, width, height, door_rh)
 	local loc_origin = {origin[1], origin[2], origin[3]} 
 
-	if general_data.drawing_symbols == false then return nil end
 	if door_rh then
 		loc_origin[1] = loc_origin[1] + width
 	end
@@ -257,7 +225,7 @@ end
 function create_drawer_tkh(general_data, specific_data, width, shelf_depth, drawer_height, origin, ext_elements, base_origin)
 
 	local h_posi_code = 'center'
-	local v_posi_code = get_handle_v_pos(general_data, specific_data, drawer_height, origin)
+	local v_posi_code = 'top'
 	local loc_origin = {origin[1], origin[2], origin[3]} 	--tables are by reference, so you could overwrite the origin in the calling function. Therefore we assign by value.
 	local depth = shelf_depth --specific_data.depth - general_data.groove_dist - general_data.thickness_back
 	if specific_data.fingerpull then
@@ -265,11 +233,9 @@ function create_drawer_tkh(general_data, specific_data, width, shelf_depth, draw
 	end
 
 	--Drawer Front
-	local drawer_front = create_door_panel(general_data, width, general_data.door_thickness, drawer_height, loc_origin, "dr_front", specific_data.aux_values.row)
-	local elevation_elem = nil
-	if general_data.drawing_symbols == true then 
-		elevation_elem = create_drawerelevation_tkh(general_data, specific_data, origin, width, drawer_height)
-	end
+	local drawer_front = create_door_panel(general_data, width, general_data.door_thickness, drawer_height, loc_origin, "dr_front")
+
+	local elevation_elem = create_drawerelevation_tkh(general_data, specific_data, origin, width, drawer_height)
 	local drawer_box = nil
 	loc_origin[1] = origin[1] + general_data.thickness - general_data.gap
 	loc_origin[2] = origin[2] + general_data.door_thickness
@@ -284,24 +250,24 @@ function create_drawer_tkh(general_data, specific_data, width, shelf_depth, draw
 
 		--Drawer Box: values are max values to allow for replacement with drawer box with runners
 		local drawer_box_collection = {}
-		if specific_data.aux_values.row == 0x2 then
+		if specific_data.row == 0x2 then
 			depth = specific_data.depth - general_data.groove_dist - general_data.thickness_back
 		end
 		local token = pytha.push_local_coordinates(loc_origin, {u_axis = "x", v_axis = "y", w_axis = "z"})
 		local new_elem = pytha.create_block(width - 4 * general_data.thickness + 2 * general_data.gap, depth - 2 * general_data.thickness, general_data.thickness, {general_data.thickness, general_data.thickness, 0})
-		set_part_attributes(new_elem, "dr_box")
+		set_part_attributes(new_elem, "dr_bottom")
 		table.insert(drawer_box_collection, new_elem)
 		new_elem = pytha.create_block(width - 4 * general_data.thickness + 2 * general_data.gap, general_data.thickness, drawer_height - 2 * general_data.thickness, {general_data.thickness, 0, 0})
-		set_part_attributes(new_elem, "dr_box")
+		set_part_attributes(new_elem, "dr_front")
 		table.insert(drawer_box_collection, new_elem)
 		new_elem = pytha.create_block(general_data.thickness, depth - general_data.thickness, drawer_height - 2 * general_data.thickness, {0, 0, 0})
-		set_part_attributes(new_elem, "dr_box")
+		set_part_attributes(new_elem, "dr_left")
 		table.insert(drawer_box_collection, new_elem)
 		new_elem = pytha.create_block(general_data.thickness, depth - general_data.thickness, drawer_height - 2 * general_data.thickness, {width - 3 * general_data.thickness + 2 * general_data.gap, 0, 0})
-		set_part_attributes(new_elem, "dr_box")
+		set_part_attributes(new_elem, "dr_right")
 		table.insert(drawer_box_collection, new_elem)
 		new_elem = pytha.create_block(width - 2 * general_data.thickness + 2 * general_data.gap, general_data.thickness, drawer_height - 2 * general_data.thickness, {0, depth - general_data.thickness, 0})
-		set_part_attributes(new_elem, "dr_box")
+		set_part_attributes(new_elem, "dr_back")
 		table.insert(drawer_box_collection, new_elem)
 		pytha.pop_local_coordinates(token)
 		
@@ -337,18 +303,15 @@ function create_blind_front(general_data, specific_data, width, drawer_height, o
 	if specific_data.fingerpull then
 		drawer_height = drawer_height - 22
 	end
-
-	--this is used to create a fingerpull for the blind front
-	local v_posi_code = get_handle_v_pos(general_data, specific_data, drawer_height, origin)
-
 	
 	--Drawer Front
-	local drawer_front = create_door_panel(general_data, width, general_data.door_thickness, drawer_height, loc_origin, "blind_front", specific_data.aux_values.row)
+	local drawer_front = create_door_panel(general_data, width, general_data.door_thickness, drawer_height, loc_origin, "blind_front")
 
 	loc_origin[1] = origin[1] + general_data.thickness - general_data.gap
 	loc_origin[2] = origin[2] + general_data.door_thickness + general_data.door_carcass_gap
 	loc_origin[3] = origin[3] + 18.5
 
+	--for the blind piece it doesnt matter whether there is a fingerpull or not
 --[[ 	new_elem = pytha.create_block(width - 2 * (general_data.thickness - general_data.gap), general_data.thickness, drawer_height - 18.5 + general_data.top_gap - general_data.thickness, loc_origin)
 
 	
@@ -385,32 +348,24 @@ function create_drawerelevation_tkh(general_data, specific_data, origin, width, 
 end
 
 --handles have to be drawn in xz plane at y=0, including three group reference points at the bore hole positions left and right. With 2 reference points a knob is assumed.
-function load_handle(general_data)
-	local ref_point_coos = {}
-	local loaded_parts = pytha.import_pyo(general_data.default_folders.handle_folder)
-	if general_data.default_folders.handle_folder == nil then return nil, nil end
-	if loaded_parts == nil then return nil, nil end
-
-	local handle_parent_group = pytha.get_element_common_group(loaded_parts)
-	if handle_parent_group ~= nil then 
-		ref_point_coos = pytha.get_element_ref_point_coordinates(handle_parent_group)
+function load_handle(general_data, specific_data)
+	local loaded_parts = pytha.import_pyo(general_data.handle_file)
+	if loaded_parts ~= nil then 
+		for i = #loaded_parts, 1, -1 do 
+			local ref_point_coos = pytha.get_element_ref_point_coordinates(loaded_parts[i])
+			if #ref_point_coos > 0 then 
+				local left_point = {ref_point_coos[1][1], ref_point_coos[1][2], ref_point_coos[1][3]}
+				local right_point = {ref_point_coos[1][1], ref_point_coos[1][2], ref_point_coos[1][3]}
+				if #ref_point_coos > 1 then
+					right_point = {ref_point_coos[2][1], ref_point_coos[2][2], ref_point_coos[2][3]}
+				end
+				pytha.move_element(loaded_parts, {-left_point[1], -left_point[2], -left_point[3]}) 
+			end
+		end
 	end
-	return handle_parent_group, ref_point_coos
+	return loaded_parts
 end
---doors have to be drawn in xz plane, including four group reference points: 1. Top left, 2. Top right, 3. Bottom left, 4. Top left front
-function load_front_panel(general_data, para_length, para_height, door_key, row)
-	local ref_point_coos = {}
-	local loaded_parts = pytha.import_pyo(general_data.default_folders.panel_folder, {}, {}, {length = para_length, height = para_height})
-	if general_data.default_folders.panel_folder == nil then return nil, nil end
-	if loaded_parts == nil then return nil, nil end
 
-	set_part_attributes(loaded_parts, door_key, nil, row)
-	local front_parent_group = pytha.get_element_common_group(loaded_parts)
-	if front_parent_group ~= nil then 
-		ref_point_coos = pytha.get_element_ref_point_coordinates(front_parent_group)
-	end
-	return front_parent_group, ref_point_coos, loaded_parts
-end
 
 --origin, width and height are for the whole door. The handle then is positioned according to the posi codes
 function create_handle(general_data, specific_data, origin, width, height, vert, h_posi_code, v_posi_code, base_origin)
@@ -431,16 +386,7 @@ function create_handle(general_data, specific_data, origin, width, height, vert,
 	local vert_off = general_data.handle_dist_vert
 	
 	local perp_dir = {0,1,0}	--its just shorter
-	local ref_point_coos = {}
-	local handle_group = nil
-	if general_data.handle_type == 4 and general_data.default_folders.handle_folder then
-		depth = 0
-		handle_group, ref_point_coos = load_handle(general_data)
-		if handle_group == nil or ref_point_coos == nil then return end
-		if #ref_point_coos > 1 then 
-			handle_length = PYTHAGORAS(ref_point_coos[2][1] - ref_point_coos[1][1], ref_point_coos[2][2] - ref_point_coos[1][2], ref_point_coos[2][3] - ref_point_coos[1][3])
-		end
-	end
+
 	-- handle offset to front, this is independent of handle position
 	loc_origin[1] = loc_origin[1]
 	loc_origin[2] = loc_origin[2] - depth
@@ -533,6 +479,7 @@ function create_handle(general_data, specific_data, origin, width, height, vert,
 							left_rp[3] - handle_over * main_dir[3]}
 
 	local options = {u_axis = perp_dir, v_axis = third_dir, w_axis = main_dir}
+	local handle_group = nil
 	local grouping_table = {}
 	if general_data.handle_type == 2 then
 		handle_cyl = pytha.create_cylinder(total_length, diameter / 2, cylinder_origin, options)
@@ -591,45 +538,9 @@ function create_handle(general_data, specific_data, origin, width, height, vert,
 		pytha.create_element_ref_point(handle_group, left_rp)
 		
 		pytha.create_element_ref_point(handle_group, bore_hole_origin)
-	elseif general_data.handle_type == 4 and general_data.default_folders.handle_folder then
-		if #ref_point_coos > 0 then 
-			pytha.move_element(handle_group, {-ref_point_coos[1][1], - ref_point_coos[1][2], - ref_point_coos[1][3]})
-		end
-		if #ref_point_coos > 1 then 	--handle type
-			pytha.move_element(handle_group, left_rp)
-			pytha.rotate_element(handle_group, left_rp, perp_dir, -ATAN(main_dir[3], main_dir[1]))
-
-			options = {w_axis = perp_dir, segments = 12}
-			local bore_hole_origin1 = {left_rp[1] + (general_data.door_thickness) * perp_dir[1], left_rp[2] + (general_data.door_thickness) * perp_dir[2], left_rp[3]}
-			local bore_hole_origin2 = {right_rp[1] + (general_data.door_thickness) * perp_dir[1], right_rp[2] + (general_data.door_thickness) * perp_dir[2], right_rp[3]}
-			local handle_bore_hole1 = pytha.create_circle(bore_hole_diameter / 2, bore_hole_origin1, options)
-			local handle_bore_hole2 = pytha.create_circle(bore_hole_diameter / 2, bore_hole_origin2, options)
-			set_part_attributes(handle_bore_hole1, "bore_hole")
-			set_part_attributes(handle_bore_hole2, "bore_hole")
-			grouping_table = {handle_group, handle_bore_hole1, handle_bore_hole2}
-			handle_group = pytha.create_group(grouping_table, {name = attribute_list["handle"].name})
-			pytha.create_element_ref_point(handle_group, left_rp)
-			pytha.create_element_ref_point(handle_group, right_rp)
-			left_rp[1] = left_rp[1] + general_data.door_thickness * (perp_dir[1])
-			left_rp[2] = left_rp[2] + general_data.door_thickness * (perp_dir[2])
-			pytha.create_element_ref_point(handle_group, left_rp)
-
-		elseif #ref_point_coos > 0 then --knob type
-			pytha.move_element(handle_group, reference_coordinate)
-			options = {w_axis = perp_dir, segments = 12}
-			local bore_hole_origin = {reference_coordinate[1] + (general_data.door_thickness) * perp_dir[1], reference_coordinate[2] + (general_data.door_thickness) * perp_dir[2], reference_coordinate[3]}
-			local handle_bore_hole = pytha.create_circle(bore_hole_diameter / 2, bore_hole_origin, options)
-			set_part_attributes(handle_bore_hole, "bore_hole")
-
-			grouping_table = {handle_group, handle_bore_hole}
-			handle_group = pytha.create_group(grouping_table, {name = attribute_list["handle"].name})
-
-			pytha.create_element_ref_point(handle_group, reference_coordinate)
-			
-			pytha.create_element_ref_point(handle_group, bore_hole_origin)
-
-		end
-
+	elseif general_data.handle_type == 4 and general_data.handle_file then
+		load_handle(general_data, specific_data)
+		
 	else 
 		return handle_group
 	end
@@ -647,15 +558,11 @@ function create_dropdown_door(general_data, specific_data, width, height, origin
 	local door_height = height
 	
 	local h_posi_code = 'center'
-	--local v_posi_code = 'top'
+	local v_posi_code = 'top'
 	local vertical = false
 	local door_key = "dropdown_door"
-	
-	--should only be 'top', but it is used to create the fingerpull here!
-	local v_posi_code = get_handle_v_pos(general_data, specific_data, door_height, origin)
 
-
-	new_elem = create_door_panel(general_data, width, general_data.door_thickness, door_height, origin, door_key, specific_data.aux_values.row)
+	new_elem = create_door_panel(general_data, width, general_data.door_thickness, door_height, loc_origin, door_key)
 
 	local handle = create_handle(general_data, specific_data, origin, width, door_height, vertical, h_posi_code, v_posi_code, base_origin)
 	local door_group = pytha.create_group({handle, new_elem}, {name = attribute_list[door_key].name})
@@ -675,7 +582,9 @@ function create_dropdown_door(general_data, specific_data, width, height, origin
 		rp_pos[3] = origin[3]
 		pytha.create_element_ref_point(door_group, rp_pos)
 		rp_pos[3] = origin[3] + door_height
-
+		if specific_data.this_type == "overhead_tkh" then
+			rp_pos[3] = origin[3] + door_height
+		end
 		rp_pos[2] = rp_pos[2] - general_data.door_thickness
 		pytha.create_element_ref_point(door_group, rp_pos)
 		rp_pos[1] = rp_pos[1] + width
@@ -701,7 +610,7 @@ function create_lift_door_base(general_data, specific_data, width, height, origi
 	local vertical = false
 	local door_key = "lift_door"
 
-	new_elem = create_door_panel(general_data, width, general_data.door_thickness, door_height, origin, door_key, specific_data.aux_values.row)
+	new_elem = create_door_panel(general_data, width, general_data.door_thickness, door_height, loc_origin, door_key)
 
 	local handle = create_handle(general_data, specific_data, origin, width, door_height, vertical, h_posi_code, v_posi_code, base_origin)
 	local door_group = pytha.create_group({handle, new_elem}, {name = attribute_list[door_key].name})
@@ -721,7 +630,9 @@ function create_lift_door_base(general_data, specific_data, width, height, origi
 		rp_pos[3] = origin[3]
 		pytha.create_element_ref_point(door_group, rp_pos)
 		rp_pos[3] = origin[3] + door_height
-
+		if specific_data.this_type == "overhead_tkh" then
+			rp_pos[3] = origin[3] + door_height
+		end
 		rp_pos[2] = rp_pos[2] - general_data.door_thickness
 		pytha.create_element_ref_point(door_group, rp_pos)
 		rp_pos[1] = rp_pos[1] + width
@@ -732,5 +643,7 @@ function create_lift_door_base(general_data, specific_data, width, height, origi
 	end
 
 	table.insert(ext_elements, door_group)
+--	table.insert(ext_elements, elevation_elem)
+--	table.insert(ext_elements, plan_elem)
 	return door_group
 end

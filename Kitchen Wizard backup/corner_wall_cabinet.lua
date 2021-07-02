@@ -51,7 +51,7 @@ local function recreate_cornerwall(general_data, specific_data)
 	loc_origin[1] = 0
 	loc_origin[2] = 0
 	--Bottom
-	if specific_data.aux_values.row == 0x2 then
+	if specific_data.row == 0x2 then
 		poly_array = {{general_data.thickness, 0, 0}, 
 						{specific_data.width - depth2, 0, 0}, 
 						{specific_data.width - depth2, depth1 - specific_data.width2 + general_data.thickness, 0}, 
@@ -114,7 +114,7 @@ local function recreate_cornerwall(general_data, specific_data)
 	loc_origin[1] = general_data.thickness - general_data.groove_depth
 	loc_origin[2] = door_to_carcass + depth1 - groove_dist_back_off
 	loc_origin[3] = base_height
-	if specific_data.aux_values.row == 0x2 then
+	if specific_data.row == 0x2 then
 		loc_origin[3] = base_height + general_data.thickness - general_data.groove_depth
 		back_height = height - 2 * general_data.thickness + 2 * general_data.groove_depth
 	else
@@ -169,15 +169,15 @@ local function recreate_cornerwall(general_data, specific_data)
 			loc_origin[2] = -general_data.door_thickness - general_data.door_carcass_gap
 			loc_origin[3] = base_height
 			if specific_data.door_rh == false then 
-				
-				door_group1 = create_door_panel(general_data, door_width_left, general_data.door_thickness, height, loc_origin, door_key, specific_data.aux_values.row)
-
+				new_elem = pytha.create_block(door_width_left, general_data.door_thickness, height, loc_origin)
+				set_part_attributes(new_elem, door_key)
+				door_group1 = pytha.create_group(new_elem, {name = attribute_list[door_key].name})
 				rp_pos1 = {loc_origin[1], loc_origin[2] + general_data.door_thickness, loc_origin[3] + height}
 				rp_pos2 = {loc_origin[1] + door_width_left, loc_origin[2] + general_data.door_thickness, loc_origin[3] + height}
 				rp_pos3 = {loc_origin[1], loc_origin[2] + general_data.door_thickness, loc_origin[3]}
 				rp_pos4 = {loc_origin[1], loc_origin[2], loc_origin[3] + height}
 			else 
-				door_group1 = create_door_tkh(general_data, specific_data, door_width_left, height, loc_origin, specific_data.door_rh, ext_elements, loc_origin)
+				door_group1 = create_door_tkh(general_data, specific_data, door_width_left, height, loc_origin, specific_data.door_rh, 'bottom', ext_elements, loc_origin)
 			end
 		end
 		if door_width_right > 0 then 
@@ -192,21 +192,20 @@ local function recreate_cornerwall(general_data, specific_data)
 			options = {u_axis = {0, -1, 0}, v_axis = {1, 0, 0}, w_axis = {0,0,1}}
 
 			if specific_data.door_rh == false then 
-				
-				loc_origin[3] = 0 
 				local token = pytha.push_local_coordinates(loc_origin, options)
-				door_group2 = create_door_tkh(general_data, specific_data, door_width_right, height, {0,0,base_height}, specific_data.door_rh, ext_elements, {0,0,base_height})
+				door_group2 = create_door_tkh(general_data, specific_data, door_width_right, height, {0,0,0}, specific_data.door_rh, 'bottom', ext_elements, {0,0,0})
 				pytha.pop_local_coordinates(token)
 			else 
 				local token = pytha.push_local_coordinates(loc_origin, options)
-				door_group2 = create_door_panel(general_data, door_width_right, general_data.door_thickness, height, {0,0,0}, door_key, specific_data.aux_values.row)
+				new_elem = pytha.create_block(door_width_right, general_data.door_thickness, height, {0,0,0})
 				pytha.pop_local_coordinates(token)
-
+				set_part_attributes(new_elem, door_key)
 				rp_pos1 = {loc_origin[1] + general_data.door_thickness, loc_origin[2], loc_origin[3] + height}
 				rp_pos2 = {loc_origin[1] + general_data.door_thickness, loc_origin[2] - door_width_left, loc_origin[3] + height}
 				rp_pos3 = {loc_origin[1] + general_data.door_thickness, loc_origin[2], loc_origin[3]}
 				rp_pos4 = {loc_origin[1], loc_origin[2], loc_origin[3] + height}
 				
+				door_group2 = pytha.create_group(new_elem, {name = attribute_list[door_key].name})
 			end
 
 		end
@@ -237,24 +236,24 @@ local function recreate_cornerwall(general_data, specific_data)
 	set_part_attributes(new_elem, "light")
 	table.insert(cur_elements, new_elem)
 
-	specific_data.aux_values.left_direction = 0
+	specific_data.left_direction = 0
 	
 	carcass_elements = pytha.create_group(carcass_elements, {name = attribute_list["carcass"].name})	
 	table.insert(cur_elements, carcass_elements)
 	
-	specific_data.aux_values.main_group = pytha.create_group(cur_elements)
+	specific_data.main_group = pytha.create_group(cur_elements)
 	
 
 	
-	return specific_data.aux_values.main_group
+	return specific_data.main_group
 end
 
 local function placement_cornerwall(general_data, specific_data)
-	specific_data.aux_values.right_connection_point = {specific_data.width, specific_data.depth - specific_data.width2, 0}
-	specific_data.aux_values.left_connection_point = {0, specific_data.depth, 0}
+	specific_data.right_connection_point = {specific_data.width, specific_data.depth - specific_data.width2, 0}
+	specific_data.left_connection_point = {0, specific_data.depth, 0}
 	specific_data.origin_point = {specific_data.width, specific_data.depth, 0}
-	specific_data.aux_values.right_direction = -90
-	specific_data.aux_values.left_direction = 0
+	specific_data.right_direction = -90
+	specific_data.left_direction = 0
 end
 
 local function ui_update_cornerwall(general_data, soft_update)
@@ -281,7 +280,7 @@ if cabinet_typelist == nil then
 end
 cabinet_typelist.cornerwall = 				
 {									
-	name = pyloc "Corner wall",
+	name = pyloc "Corner wall cabinet",
 	row = 0x2,
 	default_data = function(general_data, specific_data) specific_data.width = 650
 														specific_data.width2 = 650

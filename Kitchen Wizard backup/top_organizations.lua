@@ -196,10 +196,6 @@ top_style_list.top_solid = {
 
 
 -- Fingerpull Sides
-function get_fingerpull_arrays(general_data, specific_data)
-
-end
-
 function recreate_fingerpull(general_data, specific_data, width, new_elem, origin, return_handles)
 	local subtract_elements = {}
 	local loc_origin = {origin[1], origin[2], origin[3]}

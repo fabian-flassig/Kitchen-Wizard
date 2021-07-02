@@ -12,12 +12,9 @@ function wizard_dialog(dialog, data)
 	
 	dialog:create_label(1, pyloc "General settings")
 	
-	local button_ori = dialog:create_button(2, pyloc "Pick origin and direction")		--This text actually gives a 25 character wide minimum width for the controls.
-	local button_ori_left = dialog:create_check_box(3, pyloc "Orient leftwards")
-	local further_settings = dialog:create_button(4, pyloc "General settings")
+	local button_ori = dialog:create_button({2,3}, pyloc "Pick origin and direction")
+	local button_ori_left = dialog:create_check_box(4, pyloc "Orient leftwards")
 	button_ori_left:set_control_checked(data.orient_leftwards)
-	
-	dialog:create_align({1,4}) 
 	
 	dialog:create_label(1, pyloc "Benchtop height")
 	local bt_height = dialog:create_text_box(2, pyui.format_length(data.benchtop_height))
@@ -25,13 +22,12 @@ function wizard_dialog(dialog, data)
 	local general_height_top = dialog:create_text_box(2, pyui.format_length(data.general_height_top))
 	
 	local handle_settings = dialog:create_button(3, pyloc "Handles and panels")
+	local further_settings = dialog:create_button(4, pyloc "General settings")
 	local counter_settings = dialog:create_button(3, pyloc "Counter")
-	local material_settings = dialog:create_button(4, pyloc "Materials")
-	local splashback_settings = dialog:create_button(4, pyloc "Splashback")
 	
 	controls.specific_area_gb = dialog:create_group_box({1,4}, pyloc "This cabinet")
 	main_prev_control = controls.specific_area_gb
-	controls.typecombo_label = dialog:create_label(1, pyloc "Cabinet type")
+	controls.typecombo_label = dialog:create_label(1, pyloc "Type")
 	controls.typecombo = dialog:create_drop_list(2)
 	controls.subtypecombo_label = dialog:create_label(1, pyloc "Organization")
 	controls.subtypecombo = dialog:create_drop_list(2)
@@ -70,7 +66,7 @@ function wizard_dialog(dialog, data)
 	dialog:create_cancel_button(4)
 	
 	dialog:equalize_column_widths({1,2,3,4})
---	dialog:set_column_stretch({1,3}, 0)
+	
 -------------------------------------------------------------------------------------------------------
 --Here we set the dialog handlers
 -------------------------------------------------------------------------------------------------------
@@ -116,7 +112,7 @@ function wizard_dialog(dialog, data)
 		local old_general_height_top = data.general_height_top
 		data.general_height_top = math.max(pyui.parse_length(text) or data.general_height_top, 0)
 		for i,spec_data in pairs(data.cabinet_list) do
-			if spec_data.aux_values.row ~= 0x1 and spec_data.height_top == old_general_height_top then
+			if spec_data.row ~= 0x1 and spec_data.height_top == old_general_height_top then
 				spec_data.height_top = data.general_height_top
 			end
 		end
@@ -127,16 +123,8 @@ function wizard_dialog(dialog, data)
 		open_further_settings_dialog(data)
 	end)
 	
-	material_settings:set_on_click_handler(function() 
-		open_materials_dialog(data)
-	end)
-	
 	counter_settings:set_on_click_handler(function() 
 		open_counter_settings_dialog(data)
-	end)
-	
-	splashback_settings:set_on_click_handler(function() 
-		open_splashback_settings_dialog(data)
 	end)
 	
 	
@@ -151,7 +139,7 @@ function wizard_dialog(dialog, data)
 
 
 	controls.typecombo:set_on_change_handler(function(text, new_index)
-		local cab_type = typecombolist[data.cabinet_list[data.current_cabinet].aux_values.row][new_index]
+		local cab_type = typecombolist[data.cabinet_list[data.current_cabinet].row][new_index]
 		assign_cabinet_type(data, data.current_cabinet, cab_type)
 		recreate_all(data, false)
 	end)
@@ -165,24 +153,21 @@ function wizard_dialog(dialog, data)
 	
 	controls.appliance_model:set_on_change_handler(function(text, new_index)
 		local specific_data = data.cabinet_list[data.current_cabinet]
-		if specific_data.aux_values.appliance_list[new_index].ui_function then 
-			local no_appl_text = specific_data.aux_values.appliance_list[new_index].disp_text
-			local def_folder_key = specific_data.aux_values.appliance_list[new_index].folder_key
-			new_index = specific_data.aux_values.appliance_list[new_index].ui_function(data, specific_data, true, def_folder_key, no_appl_text)
+		if specific_data.appliance_list[new_index].ui_function then 
+			new_index = specific_data.appliance_list[new_index].ui_function(data, specific_data, true)
 		end
-		specific_data.appliance_file = specific_data.aux_values.appliance_list[new_index].file_handle
-		recreate_all(data, false)
+		specific_data.appliance_file = specific_data.appliance_list[new_index].file_handle
+		recreate_all(data, true)
 	end)
 	
 	controls.appliance_model2:set_on_change_handler(function(text, new_index)
 		local specific_data = data.cabinet_list[data.current_cabinet]
-		if specific_data.aux_values.appliance_list2[new_index].ui_function then 
-			local no_appl_text = specific_data.aux_values.appliance_list2[new_index].disp_text
-			local def_folder_key = specific_data.aux_values.appliance_list2[new_index].folder_key
-			new_index = specific_data.aux_values.appliance_list2[new_index].ui_function(data, specific_data, true, def_folder_key, no_appl_text)
+		pyui.alert(new_index)
+		if specific_data.appliance_list2[new_index].ui_function then 
+			new_index = specific_data.appliance_list2[new_index].ui_function(data, specific_data, true)
 		end
-		specific_data.appliance_file2 = specific_data.aux_values.appliance_list2[new_index].file_handle
-		recreate_all(data, false)
+		specific_data.appliance_file2 = specific_data.appliance_list2[new_index].file_handle
+		recreate_all(data, true)
 	end)
 	
 ----------------------------------------
@@ -197,7 +182,7 @@ function wizard_dialog(dialog, data)
 		pyux.clear_highlights()	
 		if sel_part ~= nil then
 			for i,spec_data in pairs(data.cabinet_list) do 
-				local all_parts = pytha.get_group_descendants(spec_data.aux_values.main_group)
+				local all_parts = pytha.get_group_descendants(spec_data.main_group)
 				for j, part in pairs(all_parts) do
 					if sel_part[1] == part then
 						data.current_cabinet = i
@@ -216,81 +201,81 @@ function wizard_dialog(dialog, data)
 	controls.button_switch_right:set_on_click_handler(function() switch_with_right(data) end)
 	
 	button_left:set_on_click_handler(function(state) 
-		if data.cabinet_list[data.current_cabinet].aux_values.row == 0x2 then 
-			if data.cabinet_list[data.current_cabinet].aux_values.left_top_element == nil then
-				local new_element = initialize_cabinet_values(data, typecombolist[data.cabinet_list[data.current_cabinet].aux_values.row][1])
-				data.cabinet_list[data.current_cabinet].aux_values.left_top_element = new_element
-				data.cabinet_list[new_element].aux_values.right_top_element = data.current_cabinet
+		if data.cabinet_list[data.current_cabinet].row == 0x2 then 
+			if data.cabinet_list[data.current_cabinet].left_top_element == nil then
+				local new_element = initialize_cabinet_values(data, typecombolist[data.cabinet_list[data.current_cabinet].row][1])
+				data.cabinet_list[data.current_cabinet].left_top_element = new_element
+				data.cabinet_list[new_element].right_top_element = data.current_cabinet
 			end
-			data.current_cabinet = data.cabinet_list[data.current_cabinet].aux_values.left_top_element
+			data.current_cabinet = data.cabinet_list[data.current_cabinet].left_top_element
 		else
-			if data.cabinet_list[data.current_cabinet].aux_values.left_element == nil then
-				local new_element = initialize_cabinet_values(data, typecombolist[data.cabinet_list[data.current_cabinet].aux_values.row][1])
-				data.cabinet_list[data.current_cabinet].aux_values.left_element = new_element
-				data.cabinet_list[new_element].aux_values.right_element = data.current_cabinet
+			if data.cabinet_list[data.current_cabinet].left_element == nil then
+				local new_element = initialize_cabinet_values(data, typecombolist[data.cabinet_list[data.current_cabinet].row][1])
+				data.cabinet_list[data.current_cabinet].left_element = new_element
+				data.cabinet_list[new_element].right_element = data.current_cabinet
 			end
-			data.current_cabinet = data.cabinet_list[data.current_cabinet].aux_values.left_element
+			data.current_cabinet = data.cabinet_list[data.current_cabinet].left_element
 		end
 		recreate_all(data, false)
 	end)
 	button_right:set_on_click_handler(function(state)
-		if data.cabinet_list[data.current_cabinet].aux_values.row == 0x2 then 
-			if data.cabinet_list[data.current_cabinet].aux_values.right_top_element == nil then
-				local new_element = initialize_cabinet_values(data, typecombolist[data.cabinet_list[data.current_cabinet].aux_values.row][1])
-				data.cabinet_list[data.current_cabinet].aux_values.right_top_element = new_element
-				data.cabinet_list[new_element].aux_values.left_top_element = data.current_cabinet
+		if data.cabinet_list[data.current_cabinet].row == 0x2 then 
+			if data.cabinet_list[data.current_cabinet].right_top_element == nil then
+				local new_element = initialize_cabinet_values(data, typecombolist[data.cabinet_list[data.current_cabinet].row][1])
+				data.cabinet_list[data.current_cabinet].right_top_element = new_element
+				data.cabinet_list[new_element].left_top_element = data.current_cabinet
 			end
-			data.current_cabinet = data.cabinet_list[data.current_cabinet].aux_values.right_top_element
+			data.current_cabinet = data.cabinet_list[data.current_cabinet].right_top_element
 		else
-			if data.cabinet_list[data.current_cabinet].aux_values.right_element == nil then
-				local new_element = initialize_cabinet_values(data, typecombolist[data.cabinet_list[data.current_cabinet].aux_values.row][1])
-				data.cabinet_list[data.current_cabinet].aux_values.right_element = new_element
-				data.cabinet_list[new_element].aux_values.left_element = data.current_cabinet
+			if data.cabinet_list[data.current_cabinet].right_element == nil then
+				local new_element = initialize_cabinet_values(data, typecombolist[data.cabinet_list[data.current_cabinet].row][1])
+				data.cabinet_list[data.current_cabinet].right_element = new_element
+				data.cabinet_list[new_element].left_element = data.current_cabinet
 			end
-			data.current_cabinet = data.cabinet_list[data.current_cabinet].aux_values.right_element
+			data.current_cabinet = data.cabinet_list[data.current_cabinet].right_element
 		end
 		recreate_all(data, false)
 	end)
 	insert_left:set_on_click_handler(function(state)
-		local left_element = data.cabinet_list[data.current_cabinet].aux_values.left_element
-		local left_top_element = data.cabinet_list[data.current_cabinet].aux_values.left_top_element
-		local new_element = initialize_cabinet_values(data, typecombolist[data.cabinet_list[data.current_cabinet].aux_values.row][1])
-		if data.cabinet_list[data.current_cabinet].aux_values.row == 0x2 then 
-			data.cabinet_list[new_element].aux_values.right_top_element = data.current_cabinet
-			data.cabinet_list[new_element].aux_values.left_top_element = data.cabinet_list[data.current_cabinet].aux_values.left_top_element
+		local left_element = data.cabinet_list[data.current_cabinet].left_element
+		local left_top_element = data.cabinet_list[data.current_cabinet].left_top_element
+		local new_element = initialize_cabinet_values(data, typecombolist[data.cabinet_list[data.current_cabinet].row][1])
+		if data.cabinet_list[data.current_cabinet].row == 0x2 then 
+			data.cabinet_list[new_element].right_top_element = data.current_cabinet
+			data.cabinet_list[new_element].left_top_element = data.cabinet_list[data.current_cabinet].left_top_element
 			if left_top_element ~= nil then
-				data.cabinet_list[left_top_element].aux_values.right_top_element = new_element
+				data.cabinet_list[left_top_element].right_top_element = new_element
 			end
-			data.cabinet_list[data.current_cabinet].aux_values.left_top_element = new_element
+			data.cabinet_list[data.current_cabinet].left_top_element = new_element
 		else
-			data.cabinet_list[new_element].aux_values.right_element = data.current_cabinet
-			data.cabinet_list[new_element].aux_values.left_element = data.cabinet_list[data.current_cabinet].aux_values.left_element
+			data.cabinet_list[new_element].right_element = data.current_cabinet
+			data.cabinet_list[new_element].left_element = data.cabinet_list[data.current_cabinet].left_element
 			if left_element ~= nil then
-				data.cabinet_list[left_element].aux_values.right_element = new_element
+				data.cabinet_list[left_element].right_element = new_element
 			end
-			data.cabinet_list[data.current_cabinet].aux_values.left_element = new_element
+			data.cabinet_list[data.current_cabinet].left_element = new_element
 		end
 		data.current_cabinet = new_element
 		recreate_all(data, false)
 	end)
 	insert_right:set_on_click_handler(function(state)
-		local right_element = data.cabinet_list[data.current_cabinet].aux_values.right_element
-		local right_top_element = data.cabinet_list[data.current_cabinet].aux_values.right_top_element
-		local new_element = initialize_cabinet_values(data, typecombolist[data.cabinet_list[data.current_cabinet].aux_values.row][1])
-		if data.cabinet_list[data.current_cabinet].aux_values.row == 0x2 then 
-			data.cabinet_list[new_element].aux_values.left_top_element = data.current_cabinet
-			data.cabinet_list[new_element].aux_values.right_top_element = data.cabinet_list[data.current_cabinet].aux_values.right_top_element
+		local right_element = data.cabinet_list[data.current_cabinet].right_element
+		local right_top_element = data.cabinet_list[data.current_cabinet].right_top_element
+		local new_element = initialize_cabinet_values(data, typecombolist[data.cabinet_list[data.current_cabinet].row][1])
+		if data.cabinet_list[data.current_cabinet].row == 0x2 then 
+			data.cabinet_list[new_element].left_top_element = data.current_cabinet
+			data.cabinet_list[new_element].right_top_element = data.cabinet_list[data.current_cabinet].right_top_element
 			if right_top_element ~= nil then
-				data.cabinet_list[right_top_element].aux_values.left_top_element = new_element
+				data.cabinet_list[right_top_element].left_top_element = new_element
 			end
-			data.cabinet_list[data.current_cabinet].aux_values.right_top_element = new_element
+			data.cabinet_list[data.current_cabinet].right_top_element = new_element
 		else
-			data.cabinet_list[new_element].aux_values.left_element = data.current_cabinet
-			data.cabinet_list[new_element].aux_values.right_element = data.cabinet_list[data.current_cabinet].aux_values.right_element
+			data.cabinet_list[new_element].left_element = data.current_cabinet
+			data.cabinet_list[new_element].right_element = data.cabinet_list[data.current_cabinet].right_element
 			if right_element ~= nil then
-				data.cabinet_list[right_element].aux_values.left_element = new_element
+				data.cabinet_list[right_element].left_element = new_element
 			end
-			data.cabinet_list[data.current_cabinet].aux_values.right_element = new_element
+			data.cabinet_list[data.current_cabinet].right_element = new_element
 		end
 		data.current_cabinet = new_element
 		recreate_all(data, false)
@@ -302,20 +287,20 @@ function wizard_dialog(dialog, data)
 	
 	controls.insert_top:set_on_click_handler(function(state)
 		local new_element = initialize_cabinet_values(data, typecombolist[0x2][1])
-		if data.cabinet_list[data.current_cabinet].aux_values.row == 0x3 then 
-			data.cabinet_list[new_element].aux_values.left_top_element = data.current_cabinet
-			data.cabinet_list[data.current_cabinet].aux_values.right_top_element = new_element
+		if data.cabinet_list[data.current_cabinet].row == 0x3 then 
+			data.cabinet_list[new_element].left_top_element = data.current_cabinet
+			data.cabinet_list[data.current_cabinet].right_top_element = new_element
 		else
-			data.cabinet_list[new_element].aux_values.bottom_element = data.current_cabinet
-			data.cabinet_list[data.current_cabinet].aux_values.top_element = new_element
+			data.cabinet_list[new_element].bottom_element = data.current_cabinet
+			data.cabinet_list[data.current_cabinet].top_element = new_element
 		end
 		data.current_cabinet = new_element
 		recreate_all(data, false)
 	end)
 	controls.insert_top_left:set_on_click_handler(function(state)
 		local new_element = initialize_cabinet_values(data, typecombolist[0x2][1])
-		data.cabinet_list[new_element].aux_values.right_top_element = data.current_cabinet
-		data.cabinet_list[data.current_cabinet].aux_values.left_top_element = new_element
+		data.cabinet_list[new_element].right_top_element = data.current_cabinet
+		data.cabinet_list[data.current_cabinet].left_top_element = new_element
 		data.current_cabinet = new_element
 		recreate_all(data, false)
 	end)
@@ -325,7 +310,6 @@ end
 
 function recreate_all(data, soft_update)
 	update_ui(data, soft_update)
-	write_data_to_default_specific_type_data(data.cabinet_list[data.current_cabinet])
 	recreate_geometry(data, false)
 end
 
@@ -388,11 +372,8 @@ function update_ui(data, soft_update)
 			contr.label_id = nil 
 		end
 	end
-	
 	controls.appliance_model:reset_content()
-	controls.appliance_model2:reset_content()
-	controls.typecombo:reset_content()
-	controls.subtypecombo:reset_content()
+	controls.appliance_model:reset_content()
 
 	control_list_for_specific_dialog = {}
 	
@@ -412,7 +393,7 @@ function update_ui(data, soft_update)
 	end
 
 --show the right arrow and insert buttons
-	if specific_data.aux_values.row == 0x3 then 
+	if specific_data.row == 0x3 then 
 		controls.button_up:set_control_text(pyloc "Top" .. " \u{21D0}")
 		controls.button_down:set_control_text(pyloc "Top" .. " \u{21D2}")
 		controls.insert_top:set_control_text(pyloc "Insert top right")
@@ -422,18 +403,18 @@ function update_ui(data, soft_update)
 		controls.button_down:set_control_text("\u{21D3}")
 		controls.insert_top:set_control_text(pyloc "Insert top")
 	end 
-	if specific_data.aux_values.row ~= 0x2 then
+	if specific_data.row ~= 0x2 then
 		controls.button_up:show_control()
 	end
 	
-	if specific_data.aux_values.row & 0x1 ~= 0 and specific_data.aux_values.top_element == nil then
+	if specific_data.row & 0x1 ~= 0 and specific_data.top_element == nil then
 		controls.insert_top:show_control()
 	end
-	if specific_data.aux_values.row == 0x3 then
+	if specific_data.row == 0x3 then
 		controls.insert_top_left:show_control()
 		controls.button_down:show_control()
 	end
-	if specific_data.aux_values.row & 0x1 == 0 then 
+	if specific_data.row & 0x1 == 0 then 
 		controls.button_down:show_control()
 	end
 	
@@ -445,8 +426,9 @@ function update_ui(data, soft_update)
 --Cabinet type combo 	
 	controls.typecombo:show_control()
 	controls.typecombo_label:show_control()
+	controls.typecombo:reset_content()
 	local current_number = 0
-	for i, k in pairs(typecombolist[specific_data.aux_values.row]) do
+	for i, k in pairs(typecombolist[specific_data.row]) do
 		controls.typecombo:insert_control_item(cabinet_typelist[k].name)
 		if k == specific_data.this_type then 
 			current_number = i
@@ -461,6 +443,7 @@ function update_ui(data, soft_update)
 		controls.subtypecombo:show_control()
 		controls.subtypecombo_label:show_control()
 		
+		controls.subtypecombo:reset_content()
 		local current_front = 0
 		for i, k in pairs(spec_type_info.organization_styles) do
 			controls.subtypecombo:insert_control_item(organization_style_list[k].name)
@@ -488,20 +471,30 @@ function update_ui(data, soft_update)
 
 	--Appliance combo 1
 	local selected_i = 1
-	if #specific_data.aux_values.appliance_list > 0 then
-		for i,k in pairs(specific_data.aux_values.appliance_list) do 
+	if #specific_data.appliance_list > 0 then
+		for i,k in pairs(specific_data.appliance_list) do 
 			controls.appliance_model:insert_control_item(k.name)
 			if specific_data.appliance_file and specific_data.appliance_file == k.file_handle then 
 				selected_i = i
 			end
 		end
+		if selected_i == 1 then 
+			specific_data.appliance_file = nil 
+		end
+		if  #specific_data.appliance_list > 2 and selected_i == 1 then 
+			specific_data.appliance_file = specific_data.appliance_list[2].file_handle
+			controls.appliance_model:set_control_selection(2)
+			selected_i = 2
+		else 
+			specific_data.appliance_file = specific_data.appliance_list[selected_i].file_handle
+			controls.appliance_model:set_control_selection(selected_i)
+		end
 	end
-	controls.appliance_model:set_control_selection(selected_i)
 	
 	--Appliance combo 2
 	selected_i = 1
-	if #specific_data.aux_values.appliance_list2 > 0 then
-		for i,k in pairs(specific_data.aux_values.appliance_list2) do 
+	if #specific_data.appliance_list2 > 0 then
+		for i,k in pairs(specific_data.appliance_list2) do 
 			controls.appliance_model2:insert_control_item(k.name)
 			if specific_data.appliance_file2 and specific_data.appliance_file2 == k.file_handle then 
 				selected_i = i
@@ -510,34 +503,41 @@ function update_ui(data, soft_update)
 		if selected_i == 1 then 
 			specific_data.appliance_file2 = nil 
 		end
-	end
-	controls.appliance_model2:set_control_selection(selected_i)
-
-
-	if specific_data.aux_values.row == 0x1 then 
-		if specific_data.aux_values.left_element ~= nil then 
-			controls.button_switch_left:show_control()
-		end
-		if specific_data.aux_values.right_element ~= nil then 
-			controls.button_switch_right:show_control()
-		end
-	elseif specific_data.aux_values.row == 0x3 then 
-		if specific_data.aux_values.left_element ~= nil or specific_data.aux_values.left_top_element ~= nil then 
-			controls.button_switch_left:show_control()
-		end
-		if specific_data.aux_values.right_element ~= nil or specific_data.aux_values.right_top_element ~= nil then 
-			controls.button_switch_right:show_control()
-		end
-	elseif specific_data.aux_values.row == 0x2 then 
-		if specific_data.aux_values.left_top_element ~= nil then 
-			controls.button_switch_left:show_control()
-		end
-		if specific_data.aux_values.right_top_element ~= nil then 
-			controls.button_switch_right:show_control()
+		if  #specific_data.appliance_list2 > 2 and selected_i == 1 then 
+			specific_data.appliance_file2 = specific_data.appliance_list2[2].file_handle
+			controls.appliance_model2:set_control_selection(2)
+			selected_i = 2
+		else 
+			specific_data.appliance_file2 = specific_data.appliance_list2[selected_i].file_handle
+			controls.appliance_model2:set_control_selection(selected_i)
 		end
 	end
 
-	if not (data.current_cabinet == 1 and specific_data.aux_values.left_element == nil and specific_data.aux_values.right_element == nil) then
+
+	if specific_data.row == 0x1 then 
+		if specific_data.left_element ~= nil then 
+			controls.button_switch_left:show_control()
+		end
+		if specific_data.right_element ~= nil then 
+			controls.button_switch_right:show_control()
+		end
+	elseif specific_data.row == 0x3 then 
+		if specific_data.left_element ~= nil or specific_data.left_top_element ~= nil then 
+			controls.button_switch_left:show_control()
+		end
+		if specific_data.right_element ~= nil or specific_data.right_top_element ~= nil then 
+			controls.button_switch_right:show_control()
+		end
+	elseif specific_data.row == 0x2 then 
+		if specific_data.left_top_element ~= nil then 
+			controls.button_switch_left:show_control()
+		end
+		if specific_data.right_top_element ~= nil then 
+			controls.button_switch_right:show_control()
+		end
+	end
+
+	if not (data.current_cabinet == 1 and specific_data.left_element == nil and specific_data.right_element == nil) then
 		controls.button_delete:show_control()
 	end
 	
@@ -546,72 +546,72 @@ end
 
 function move_up(data)
 	local specific_data = data.cabinet_list[data.current_cabinet]
-	if specific_data.aux_values.row == 0x3 then 
-		if specific_data.aux_values.left_top_element == nil then
+	if specific_data.row == 0x3 then 
+		if specific_data.left_top_element == nil then
 			local new_element = initialize_cabinet_values(data, typecombolist[0x2][1])
-			specific_data.aux_values.left_top_element = new_element
-			data.cabinet_list[new_element].aux_values.right_top_element = data.current_cabinet
+			specific_data.left_top_element = new_element
+			data.cabinet_list[new_element].right_top_element = data.current_cabinet
 		end
-		data.current_cabinet = specific_data.aux_values.left_top_element
+		data.current_cabinet = specific_data.left_top_element
 	else
-		if specific_data.aux_values.top_element ~= nil then
-			data.current_cabinet = specific_data.aux_values.top_element
+		if specific_data.top_element ~= nil then
+			data.current_cabinet = specific_data.top_element
 		else
 		--first check for existing nearby top element, otherwise add new 
-			local next_base = specific_data.aux_values.right_element
+			local next_base = specific_data.right_element
 			local steps = 1
 			local found = nil
 			while next_base ~= nil do
-				if data.cabinet_list[next_base].aux_values.top_element ~= nil or data.cabinet_list[next_base].aux_values.row == 0x3 then
+				if data.cabinet_list[next_base].top_element ~= nil or data.cabinet_list[next_base].row == 0x3 then
 					local next_top = nil
-					if data.cabinet_list[next_base].aux_values.top_element ~= nil then 
-						next_top = data.cabinet_list[next_base].aux_values.top_element
+					if data.cabinet_list[next_base].top_element ~= nil then 
+						next_top = data.cabinet_list[next_base].top_element
 					else 
 						next_top = next_base
 					end
 					for i = 1, steps, 1 do
-						if data.cabinet_list[next_top].aux_values.left_top_element == nil then 
+						if data.cabinet_list[next_top].left_top_element == nil then 
 							break
 						end
-						next_top = data.cabinet_list[next_top].aux_values.left_top_element
+						next_top = data.cabinet_list[next_top].left_top_element
 					end
 					data.current_cabinet = next_top
 					found = 1
 					break
 				end
-				next_base = data.cabinet_list[next_base].aux_values.right_element
+				next_base = data.cabinet_list[next_base].right_element
 				steps = steps + 1
 			end
 			if found == nil then 
 				steps = 1
-				next_base = specific_data.aux_values.left_element
+				next_base = specific_data.left_element
 				while next_base ~= nil do
-					if data.cabinet_list[next_base].aux_values.top_element ~= nil or data.cabinet_list[next_base].aux_values.row == 0x3 then
+					if data.cabinet_list[next_base].top_element ~= nil or data.cabinet_list[next_base].row == 0x3 then
 						local next_top = nil
-						if data.cabinet_list[next_base].aux_values.top_element ~= nil then 
-							next_top = data.cabinet_list[next_base].aux_values.top_element
+						if data.cabinet_list[next_base].top_element ~= nil then 
+							next_top = data.cabinet_list[next_base].top_element
 						else 
 							next_top = next_base
 						end
 						for i = 1, steps, 1 do
-							if data.cabinet_list[next_top].aux_values.right_top_element == nil then 
+							if data.cabinet_list[next_top].right_top_element == nil then 
 								break
 							end
-							next_top = data.cabinet_list[next_top].aux_values.right_top_element
+							next_top = data.cabinet_list[next_top].right_top_element
 						end
 						data.current_cabinet = next_top
 						found = 1
 						break
 					end
-					next_base = data.cabinet_list[next_base].aux_values.left_element
+					next_base = data.cabinet_list[next_base].left_element
 					steps = steps + 1
 				end
 			end
 			if found == nil then 
 				local new_element = initialize_cabinet_values(data, typecombolist[0x2][1])
-				specific_data.aux_values.top_element = new_element
-				data.cabinet_list[new_element].aux_values.bottom_element = data.current_cabinet
-				data.current_cabinet = specific_data.aux_values.top_element
+				specific_data.top_element = new_element
+				data.cabinet_list[new_element].bottom_element = data.current_cabinet
+				data.current_cabinet = specific_data.top_element
 			end
 		end
 	end
@@ -619,59 +619,59 @@ function move_up(data)
 end
 function move_down(data)
 	local specific_data = data.cabinet_list[data.current_cabinet]
-	if specific_data.aux_values.row == 0x3 then 
-		if specific_data.aux_values.right_top_element == nil then
+	if specific_data.row == 0x3 then 
+		if specific_data.right_top_element == nil then
 			local new_element = initialize_cabinet_values(data, typecombolist[0x2][1])
-			specific_data.aux_values.right_top_element = new_element
-			data.cabinet_list[new_element].aux_values.left_top_element = data.current_cabinet
+			specific_data.right_top_element = new_element
+			data.cabinet_list[new_element].left_top_element = data.current_cabinet
 		end
-		data.current_cabinet = specific_data.aux_values.right_top_element
+		data.current_cabinet = specific_data.right_top_element
 	else
-		if specific_data.aux_values.bottom_element ~= nil then
-			data.current_cabinet = specific_data.aux_values.bottom_element
+		if specific_data.bottom_element ~= nil then
+			data.current_cabinet = specific_data.bottom_element
 		else
-			local next_top = specific_data.aux_values.right_top_element
+			local next_top = specific_data.right_top_element
 			local steps = 1
 			while next_top ~= nil do
-				if data.cabinet_list[next_top].aux_values.bottom_element ~= nil or data.cabinet_list[next_top].aux_values.row == 0x3 then
+				if data.cabinet_list[next_top].bottom_element ~= nil or data.cabinet_list[next_top].row == 0x3 then
 					local next_bottom = nil
-					if data.cabinet_list[next_top].aux_values.bottom_element ~= nil then 
-						next_bottom = data.cabinet_list[next_top].aux_values.bottom_element
+					if data.cabinet_list[next_top].bottom_element ~= nil then 
+						next_bottom = data.cabinet_list[next_top].bottom_element
 					else 
 						next_bottom = next_top
 					end
 					for i = 1, steps, 1 do
-						if data.cabinet_list[next_bottom].aux_values.left_element == nil then 
+						if data.cabinet_list[next_bottom].left_element == nil then 
 							break
 						end
-						next_bottom = data.cabinet_list[next_bottom].aux_values.left_element
+						next_bottom = data.cabinet_list[next_bottom].left_element
 					end
 					data.current_cabinet = next_bottom
 					break
 				end
-				next_top = data.cabinet_list[next_top].aux_values.right_top_element
+				next_top = data.cabinet_list[next_top].right_top_element
 				steps = steps + 1
 			end
 			steps = 1
-			next_top = specific_data.aux_values.left_top_element
+			next_top = specific_data.left_top_element
 			while next_top ~= nil do
-				if data.cabinet_list[next_top].aux_values.bottom_element ~= nil or data.cabinet_list[next_top].aux_values.row == 0x3 then
+				if data.cabinet_list[next_top].bottom_element ~= nil or data.cabinet_list[next_top].row == 0x3 then
 					local next_bottom = nil
-					if data.cabinet_list[next_top].aux_values.bottom_element ~= nil then 
-						next_bottom = data.cabinet_list[next_top].aux_values.bottom_element
+					if data.cabinet_list[next_top].bottom_element ~= nil then 
+						next_bottom = data.cabinet_list[next_top].bottom_element
 					else 
 						next_bottom = next_top
 					end
 					for i = 1, steps, 1 do
-						if data.cabinet_list[next_bottom].aux_values.right_element == nil then 
+						if data.cabinet_list[next_bottom].right_element == nil then 
 							break
 						end
-						next_bottom = data.cabinet_list[next_bottom].aux_values.right_element
+						next_bottom = data.cabinet_list[next_bottom].right_element
 					end
 					data.current_cabinet = next_bottom
 					break
 				end
-				next_top = data.cabinet_list[next_top].aux_values.left_top_element
+				next_top = data.cabinet_list[next_top].left_top_element
 				steps = steps + 1
 			end	
 		end
@@ -684,88 +684,88 @@ function delete_element(data)
 	if data.current_cabinet == 1 and #data.cabinet_list == 1 then
 		return
 	end
-	if data.current_cabinet == 1 and specific_data.aux_values.left_element == nil and specific_data.aux_values.right_element == nil then
+	if data.current_cabinet == 1 and specific_data.left_element == nil and specific_data.right_element == nil then
 		return
 	end
 	
-	local left_element = specific_data.aux_values.left_element
-	local right_element = specific_data.aux_values.right_element
-	local left_top_element = specific_data.aux_values.left_top_element
-	local right_top_element = specific_data.aux_values.right_top_element
-	local top_element = specific_data.aux_values.top_element
-	local bottom_element = specific_data.aux_values.bottom_element
+	local left_element = specific_data.left_element
+	local right_element = specific_data.right_element
+	local left_top_element = specific_data.left_top_element
+	local right_top_element = specific_data.right_top_element
+	local top_element = specific_data.top_element
+	local bottom_element = specific_data.bottom_element
 
 	--first treat the top rows. 
-	if specific_data.aux_values.row == 0x3 then 
+	if specific_data.row == 0x3 then 
 		local bottom_defined = nil
 		if left_element ~= nil then
-			data.cabinet_list[left_element].aux_values.top_element = left_top_element
+			data.cabinet_list[left_element].top_element = left_top_element
 			if left_top_element ~= nil then
-				data.cabinet_list[left_top_element].aux_values.bottom_element = left_element
+				data.cabinet_list[left_top_element].bottom_element = left_element
 				bottom_defined = 1
 			end
 		end
 		if right_element ~= nil then
-			data.cabinet_list[right_element].aux_values.top_element = right_top_element
+			data.cabinet_list[right_element].top_element = right_top_element
 			if right_top_element ~= nil and bottom_defined == nil then
-				data.cabinet_list[right_top_element].aux_values.bottom_element = right_element
+				data.cabinet_list[right_top_element].bottom_element = right_element
 			end
 		end 
 		if left_top_element ~= nil then
-			data.cabinet_list[left_top_element].aux_values.right_top_element = right_top_element
+			data.cabinet_list[left_top_element].right_top_element = right_top_element
 		end
 		if right_top_element ~= nil then
-			data.cabinet_list[right_top_element].aux_values.left_top_element = left_top_element
+			data.cabinet_list[right_top_element].left_top_element = left_top_element
 		end
-	elseif specific_data.aux_values.row == 0x2 then 
+	elseif specific_data.row == 0x2 then 
 		if left_top_element ~= nil then
 			if bottom_element ~= nil then
-			data.cabinet_list[left_top_element].aux_values.bottom_element = bottom_element
-			data.cabinet_list[bottom_element].aux_values.top_element = left_top_element
+			data.cabinet_list[left_top_element].bottom_element = bottom_element
+			data.cabinet_list[bottom_element].top_element = left_top_element
 			end
 		elseif right_top_element ~= nil then
 			if bottom_element ~= nil then
-				data.cabinet_list[right_top_element].aux_values.bottom_element = bottom_element
-				data.cabinet_list[bottom_element].aux_values.top_element = right_top_element
+				data.cabinet_list[right_top_element].bottom_element = bottom_element
+				data.cabinet_list[bottom_element].top_element = right_top_element
 			end
 		else 
 			if bottom_element ~= nil then
-				data.cabinet_list[bottom_element].aux_values.top_element = nil
+				data.cabinet_list[bottom_element].top_element = nil
 			end
 		end 
 		if left_top_element ~= nil then
-			data.cabinet_list[left_top_element].aux_values.right_top_element = right_top_element
+			data.cabinet_list[left_top_element].right_top_element = right_top_element
 		end
 		if right_top_element ~= nil then
-			data.cabinet_list[right_top_element].aux_values.left_top_element = left_top_element
+			data.cabinet_list[right_top_element].left_top_element = left_top_element
 		end		
 	else 
 		if top_element ~= nil then
 			if left_element ~= nil then
-				if data.cabinet_list[left_element].aux_values.row == 0x3 then 
-					data.cabinet_list[left_element].aux_values.right_top_element = top_element
-					data.cabinet_list[top_element].aux_values.left_top_element = left_element
-					data.cabinet_list[top_element].aux_values.bottom_element = nil
-				elseif data.cabinet_list[left_element].aux_values.top_element ~= nil then
-					data.cabinet_list[data.cabinet_list[left_element].aux_values.top_element].aux_values.right_top_element = top_element
-					data.cabinet_list[top_element].aux_values.left_top_element = data.cabinet_list[left_element].aux_values.top_element
-					data.cabinet_list[top_element].aux_values.bottom_element = nil
+				if data.cabinet_list[left_element].row == 0x3 then 
+					data.cabinet_list[left_element].right_top_element = top_element
+					data.cabinet_list[top_element].left_top_element = left_element
+					data.cabinet_list[top_element].bottom_element = nil
+				elseif data.cabinet_list[left_element].top_element ~= nil then
+					data.cabinet_list[data.cabinet_list[left_element].top_element].right_top_element = top_element
+					data.cabinet_list[top_element].left_top_element = data.cabinet_list[left_element].top_element
+					data.cabinet_list[top_element].bottom_element = nil
 				else
-					data.cabinet_list[left_element].aux_values.top_element = top_element
-					data.cabinet_list[top_element].aux_values.bottom_element = left_element
+					data.cabinet_list[left_element].top_element = top_element
+					data.cabinet_list[top_element].bottom_element = left_element
 				end
 			elseif right_element ~= nil then
-				if data.cabinet_list[right_element].aux_values.row == 0x3 then 
-					data.cabinet_list[right_element].aux_values.left_top_element = top_element
-					data.cabinet_list[top_element].aux_values.right_top_element = right_element
-					data.cabinet_list[top_element].aux_values.bottom_element = nil
-				elseif data.cabinet_list[right_element].aux_values.top_element ~= nil then
-					data.cabinet_list[data.cabinet_list[right_element].aux_values.top_element].aux_values.left_top_element = top_element
-					data.cabinet_list[top_element].aux_values.right_top_element = data.cabinet_list[right_element].aux_values.top_element
-					data.cabinet_list[top_element].aux_values.bottom_element = nil
+				if data.cabinet_list[right_element].row == 0x3 then 
+					data.cabinet_list[right_element].left_top_element = top_element
+					data.cabinet_list[top_element].right_top_element = right_element
+					data.cabinet_list[top_element].bottom_element = nil
+				elseif data.cabinet_list[right_element].top_element ~= nil then
+					data.cabinet_list[data.cabinet_list[right_element].top_element].left_top_element = top_element
+					data.cabinet_list[top_element].right_top_element = data.cabinet_list[right_element].top_element
+					data.cabinet_list[top_element].bottom_element = nil
 				else
-					data.cabinet_list[right_element].aux_values.top_element = top_element
-					data.cabinet_list[top_element].aux_values.bottom_element = right_element
+					data.cabinet_list[right_element].top_element = top_element
+					data.cabinet_list[top_element].bottom_element = right_element
 				end
 			end
 		end
@@ -780,7 +780,7 @@ function delete_element(data)
 			right_element = 1
 		end 
 	end
-	if specific_data.aux_values.row == 0x2 then
+	if specific_data.row == 0x2 then
 		--0x2 never has a left or right element, so we set the next current caabinet either to the bottom, topleft or topright
 		if bottom_element ~= nil then
 			data.current_cabinet = bottom_element
@@ -793,10 +793,10 @@ function delete_element(data)
 		end 
 	else
 		if left_element ~= nil then
-		data.cabinet_list[left_element].aux_values.right_element = right_element
+		data.cabinet_list[left_element].right_element = right_element
 		end
 		if right_element ~= nil then
-		data.cabinet_list[right_element].aux_values.left_element = left_element
+		data.cabinet_list[right_element].left_element = left_element
 		end
 	end 
 	--we randomly prioritize the left element 
@@ -814,87 +814,87 @@ local function swap_base_base(data, left_elem, right_elem)
 -- (thus all neighbors directly get the correct informationand and we can afterwards revert the neighbor elements of the two cabinets.
 	data.cabinet_list[left_elem], data.cabinet_list[right_elem] = data.cabinet_list[right_elem], data.cabinet_list[left_elem]
 --now correct again fo the neighbors
-	data.cabinet_list[left_elem].aux_values.left_element, data.cabinet_list[right_elem].aux_values.left_element = data.cabinet_list[right_elem].aux_values.left_element, data.cabinet_list[left_elem].aux_values.left_element
-	data.cabinet_list[left_elem].aux_values.right_element, data.cabinet_list[right_elem].aux_values.right_element = data.cabinet_list[right_elem].aux_values.right_element, data.cabinet_list[left_elem].aux_values.right_element
-	data.cabinet_list[left_elem].aux_values.top_element, data.cabinet_list[right_elem].aux_values.top_element = data.cabinet_list[right_elem].aux_values.top_element, data.cabinet_list[left_elem].aux_values.top_element
+	data.cabinet_list[left_elem].left_element, data.cabinet_list[right_elem].left_element = data.cabinet_list[right_elem].left_element, data.cabinet_list[left_elem].left_element
+	data.cabinet_list[left_elem].right_element, data.cabinet_list[right_elem].right_element = data.cabinet_list[right_elem].right_element, data.cabinet_list[left_elem].right_element
+	data.cabinet_list[left_elem].top_element, data.cabinet_list[right_elem].top_element = data.cabinet_list[right_elem].top_element, data.cabinet_list[left_elem].top_element
 end
 
 local function swap_wall_wall(data, left_elem, right_elem)
 	data.cabinet_list[left_elem], data.cabinet_list[right_elem] = data.cabinet_list[right_elem], data.cabinet_list[left_elem]
-	data.cabinet_list[left_elem].aux_values.left_top_element, data.cabinet_list[right_elem].aux_values.left_top_element = data.cabinet_list[right_elem].aux_values.left_top_element, data.cabinet_list[left_elem].aux_values.left_top_element
-	data.cabinet_list[left_elem].aux_values.right_top_element, data.cabinet_list[right_elem].aux_values.right_top_element = data.cabinet_list[right_elem].aux_values.right_top_element, data.cabinet_list[left_elem].aux_values.right_top_element
+	data.cabinet_list[left_elem].left_top_element, data.cabinet_list[right_elem].left_top_element = data.cabinet_list[right_elem].left_top_element, data.cabinet_list[left_elem].left_top_element
+	data.cabinet_list[left_elem].right_top_element, data.cabinet_list[right_elem].right_top_element = data.cabinet_list[right_elem].right_top_element, data.cabinet_list[left_elem].right_top_element
 end
 
 local function swap_high_high(data, left_elem, right_elem)
 	data.cabinet_list[left_elem], data.cabinet_list[right_elem] = data.cabinet_list[right_elem], data.cabinet_list[left_elem]
 	
-	data.cabinet_list[left_elem].aux_values.left_top_element, data.cabinet_list[right_elem].aux_values.left_top_element = data.cabinet_list[right_elem].aux_values.left_top_element, data.cabinet_list[left_elem].aux_values.left_top_element
-	data.cabinet_list[left_elem].aux_values.right_top_element, data.cabinet_list[right_elem].aux_values.right_top_element = data.cabinet_list[right_elem].aux_values.right_top_element, data.cabinet_list[left_elem].aux_values.right_top_element
-	data.cabinet_list[left_elem].aux_values.left_element, data.cabinet_list[right_elem].aux_values.left_element = data.cabinet_list[right_elem].aux_values.left_element, data.cabinet_list[left_elem].aux_values.left_element
-	data.cabinet_list[left_elem].aux_values.right_element, data.cabinet_list[right_elem].aux_values.right_element = data.cabinet_list[right_elem].aux_values.right_element, data.cabinet_list[left_elem].aux_values.right_element
+	data.cabinet_list[left_elem].left_top_element, data.cabinet_list[right_elem].left_top_element = data.cabinet_list[right_elem].left_top_element, data.cabinet_list[left_elem].left_top_element
+	data.cabinet_list[left_elem].right_top_element, data.cabinet_list[right_elem].right_top_element = data.cabinet_list[right_elem].right_top_element, data.cabinet_list[left_elem].right_top_element
+	data.cabinet_list[left_elem].left_element, data.cabinet_list[right_elem].left_element = data.cabinet_list[right_elem].left_element, data.cabinet_list[left_elem].left_element
+	data.cabinet_list[left_elem].right_element, data.cabinet_list[right_elem].right_element = data.cabinet_list[right_elem].right_element, data.cabinet_list[left_elem].right_element
 end
 
 function switch_with_left(data)
 	local cur_elem = data.current_cabinet
 
-	if data.cabinet_list[cur_elem].aux_values.row == 0x1 then 
-		local left_elem = data.cabinet_list[cur_elem].aux_values.left_element
+	if data.cabinet_list[cur_elem].row == 0x1 then 
+		local left_elem = data.cabinet_list[cur_elem].left_element
 		
 		if data.cabinet_list[left_elem] ~= nil then 
-			if data.cabinet_list[left_elem].aux_values.row == 0x1 then 
+			if data.cabinet_list[left_elem].row == 0x1 then 
 				swap_base_base(data, left_elem, cur_elem)
-			elseif data.cabinet_list[left_elem].aux_values.row == 0x2 then 
+			elseif data.cabinet_list[left_elem].row == 0x2 then 
 				--should not happen!
-			elseif data.cabinet_list[left_elem].aux_values.row == 0x3 then 
+			elseif data.cabinet_list[left_elem].row == 0x3 then 
 				--here we need to be careful with top left and right elements as these do not exist for base cabinets. 
 				--In case a top cabinet exists base and top will be treated as one unit while swapping.
 				--Otherwise the elements stick to the old cabinet
-				local top_element = data.cabinet_list[cur_elem].aux_values.top_element
-				data.cabinet_list[data.cabinet_list[cur_elem].aux_values.left_element], data.cabinet_list[cur_elem] = data.cabinet_list[cur_elem], data.cabinet_list[data.cabinet_list[cur_elem].aux_values.left_element]
+				local top_element = data.cabinet_list[cur_elem].top_element
+				data.cabinet_list[data.cabinet_list[cur_elem].left_element], data.cabinet_list[cur_elem] = data.cabinet_list[cur_elem], data.cabinet_list[data.cabinet_list[cur_elem].left_element]
 				--now correct again fo the neighbors
-				data.cabinet_list[left_elem].aux_values.left_element, data.cabinet_list[cur_elem].aux_values.left_element = data.cabinet_list[cur_elem].aux_values.left_element, data.cabinet_list[left_elem].aux_values.left_element
-				data.cabinet_list[left_elem].aux_values.right_element, data.cabinet_list[cur_elem].aux_values.right_element = data.cabinet_list[cur_elem].aux_values.right_element, data.cabinet_list[left_elem].aux_values.right_element
+				data.cabinet_list[left_elem].left_element, data.cabinet_list[cur_elem].left_element = data.cabinet_list[cur_elem].left_element, data.cabinet_list[left_elem].left_element
+				data.cabinet_list[left_elem].right_element, data.cabinet_list[cur_elem].right_element = data.cabinet_list[cur_elem].right_element, data.cabinet_list[left_elem].right_element
 				 
 				if top_element ~= nil then 
 					top_specific_data = data.cabinet_list[top_element]
-					data.cabinet_list[left_elem].aux_values.left_top_element, top_specific_data.aux_values.left_top_element = top_specific_data.aux_values.left_top_element, data.cabinet_list[left_elem].aux_values.left_top_element
-					data.cabinet_list[left_elem].aux_values.right_top_element, top_specific_data.aux_values.right_top_element = top_specific_data.aux_values.right_top_element, data.cabinet_list[left_elem].aux_values.right_top_element
+					data.cabinet_list[left_elem].left_top_element, top_specific_data.left_top_element = top_specific_data.left_top_element, data.cabinet_list[left_elem].left_top_element
+					data.cabinet_list[left_elem].right_top_element, top_specific_data.right_top_element = top_specific_data.right_top_element, data.cabinet_list[left_elem].right_top_element
 				end
 			end
 			data.current_cabinet = left_elem
 		end
-	elseif data.cabinet_list[cur_elem].aux_values.row == 0x2 then 
+	elseif data.cabinet_list[cur_elem].row == 0x2 then 
 		--wall cabinets created on top of a base cabinet should keep that relation, e.g. for a fume hood...
-		local left_top_elem = data.cabinet_list[cur_elem].aux_values.left_top_element
+		local left_top_elem = data.cabinet_list[cur_elem].left_top_element
 		if data.cabinet_list[left_top_elem] ~= nil then 
-			if data.cabinet_list[left_top_elem].aux_values.row == 0x1 then 
+			if data.cabinet_list[left_top_elem].row == 0x1 then 
 				--should not happen!
-			elseif data.cabinet_list[left_top_elem].aux_values.row == 0x2 then 
+			elseif data.cabinet_list[left_top_elem].row == 0x2 then 
 				swap_wall_wall(data, left_top_elem, cur_elem)
-			elseif data.cabinet_list[left_top_elem].aux_values.row == 0x3 then 
+			elseif data.cabinet_list[left_top_elem].row == 0x3 then 
 				--Any wall cabinet with a high cabinet as a neighbor was created in relation to this. Thus, it can be trated like the wall-wall case		
 				swap_wall_wall(data, left_top_elem, cur_elem)
 			end
 			data.current_cabinet = left_top_elem
 		end
-	elseif data.cabinet_list[cur_elem].aux_values.row == 0x3 then 
-		local left_elem = data.cabinet_list[cur_elem].aux_values.left_element
+	elseif data.cabinet_list[cur_elem].row == 0x3 then 
+		local left_elem = data.cabinet_list[cur_elem].left_element
 		if data.cabinet_list[left_elem] ~= nil then 
-			if data.cabinet_list[left_elem].aux_values.row == 0x1 then 
-				local top_element = data.cabinet_list[left_elem].aux_values.top_element
-				data.cabinet_list[data.cabinet_list[cur_elem].aux_values.left_element], data.cabinet_list[cur_elem] = data.cabinet_list[cur_elem], data.cabinet_list[data.cabinet_list[cur_elem].aux_values.left_element]
+			if data.cabinet_list[left_elem].row == 0x1 then 
+				local top_element = data.cabinet_list[left_elem].top_element
+				data.cabinet_list[data.cabinet_list[cur_elem].left_element], data.cabinet_list[cur_elem] = data.cabinet_list[cur_elem], data.cabinet_list[data.cabinet_list[cur_elem].left_element]
 				--now correct again fo the neighbors
-				data.cabinet_list[left_elem].aux_values.left_element, data.cabinet_list[cur_elem].aux_values.left_element = data.cabinet_list[cur_elem].aux_values.left_element, data.cabinet_list[left_elem].aux_values.left_element
-				data.cabinet_list[left_elem].aux_values.right_element, data.cabinet_list[cur_elem].aux_values.right_element = data.cabinet_list[cur_elem].aux_values.right_element, data.cabinet_list[left_elem].aux_values.right_element
+				data.cabinet_list[left_elem].left_element, data.cabinet_list[cur_elem].left_element = data.cabinet_list[cur_elem].left_element, data.cabinet_list[left_elem].left_element
+				data.cabinet_list[left_elem].right_element, data.cabinet_list[cur_elem].right_element = data.cabinet_list[cur_elem].right_element, data.cabinet_list[left_elem].right_element
 				 
 				if top_element ~= nil then 
 					top_specific_data = data.cabinet_list[top_element]
-					data.cabinet_list[left_elem].aux_values.left_top_element, top_specific_data.aux_values.left_top_element = top_specific_data.aux_values.left_top_element, data.cabinet_list[left_elem].aux_values.left_top_element
-					data.cabinet_list[left_elem].aux_values.right_top_element, top_specific_data.aux_values.right_top_element = top_specific_data.aux_values.right_top_element, data.cabinet_list[left_elem].aux_values.right_top_element
+					data.cabinet_list[left_elem].left_top_element, top_specific_data.left_top_element = top_specific_data.left_top_element, data.cabinet_list[left_elem].left_top_element
+					data.cabinet_list[left_elem].right_top_element, top_specific_data.right_top_element = top_specific_data.right_top_element, data.cabinet_list[left_elem].right_top_element
 				end
-			elseif data.cabinet_list[left_elem].aux_values.row == 0x2 then 
+			elseif data.cabinet_list[left_elem].row == 0x2 then 
 				--should not happen!
-			elseif data.cabinet_list[left_elem].aux_values.row == 0x3 then 
+			elseif data.cabinet_list[left_elem].row == 0x3 then 
 				swap_high_high(data, left_elem, cur_elem)
 			end
 			data.current_cabinet = left_elem
@@ -905,61 +905,61 @@ end
 
 function switch_with_right(data)
 	local cur_elem = data.current_cabinet
-	if data.cabinet_list[cur_elem].aux_values.row == 0x1 then 
-		local right_elem = data.cabinet_list[cur_elem].aux_values.right_element
+	if data.cabinet_list[cur_elem].row == 0x1 then 
+		local right_elem = data.cabinet_list[cur_elem].right_element
 		if data.cabinet_list[right_elem] ~= nil then 
-			if data.cabinet_list[right_elem].aux_values.row == 0x1 then 
+			if data.cabinet_list[right_elem].row == 0x1 then 
 				swap_base_base(data, cur_elem, right_elem)
-			elseif data.cabinet_list[right_elem].aux_values.row == 0x2 then 
+			elseif data.cabinet_list[right_elem].row == 0x2 then 
 				--should not happen!
-			elseif data.cabinet_list[right_elem].aux_values.row == 0x3 then 
+			elseif data.cabinet_list[right_elem].row == 0x3 then 
 				--here we need to be careful with top left and right elements as these do not exist for base cabinets. 
 				--In case a top cabinet exists base and top will be treated as one unit while swapping.
 				--Otherwise the elements stick to the old cabinet
-				local top_elem = data.cabinet_list[cur_elem].aux_values.top_element
+				local top_elem = data.cabinet_list[cur_elem].top_element
 				data.cabinet_list[right_elem], data.cabinet_list[cur_elem] = data.cabinet_list[cur_elem], data.cabinet_list[right_elem]
 				--now correct again fo the neighbors
-				data.cabinet_list[right_elem].aux_values.left_element, data.cabinet_list[cur_elem].aux_values.left_element = data.cabinet_list[cur_elem].aux_values.left_element, data.cabinet_list[right_elem].aux_values.left_element
-				data.cabinet_list[right_elem].aux_values.right_element, data.cabinet_list[cur_elem].aux_values.right_element = data.cabinet_list[cur_elem].aux_values.right_element, data.cabinet_list[right_elem].aux_values.right_element
+				data.cabinet_list[right_elem].left_element, data.cabinet_list[cur_elem].left_element = data.cabinet_list[cur_elem].left_element, data.cabinet_list[right_elem].left_element
+				data.cabinet_list[right_elem].right_element, data.cabinet_list[cur_elem].right_element = data.cabinet_list[cur_elem].right_element, data.cabinet_list[right_elem].right_element
 				 
 				if top_elem ~= nil then 
-					data.cabinet_list[right_elem].aux_values.left_top_element, data.cabinet_list[top_elem].aux_values.left_top_element = data.cabinet_list[top_elem].aux_values.left_top_element, data.cabinet_list[right_elem].aux_values.left_top_element
-					data.cabinet_list[right_elem].aux_values.right_top_element, data.cabinet_list[top_elem].aux_values.right_top_element = data.cabinet_list[top_elem].aux_values.right_top_element, data.cabinet_list[right_elem].aux_values.right_top_element
+					data.cabinet_list[right_elem].left_top_element, data.cabinet_list[top_elem].left_top_element = data.cabinet_list[top_elem].left_top_element, data.cabinet_list[right_elem].left_top_element
+					data.cabinet_list[right_elem].right_top_element, data.cabinet_list[top_elem].right_top_element = data.cabinet_list[top_elem].right_top_element, data.cabinet_list[right_elem].right_top_element
 				end
 			end
 			data.current_cabinet = right_elem
 		end
-	elseif data.cabinet_list[cur_elem].aux_values.row == 0x2 then 
+	elseif data.cabinet_list[cur_elem].row == 0x2 then 
 		--wall cabinets created on top of a base cabinet should keep that relation, e.g. for a fume hood...
-		local right_top_elem = data.cabinet_list[cur_elem].aux_values.right_top_element
+		local right_top_elem = data.cabinet_list[cur_elem].right_top_element
 		if data.cabinet_list[right_top_elem] ~= nil then 
-			if data.cabinet_list[right_top_elem].aux_values.row == 0x1 then 
+			if data.cabinet_list[right_top_elem].row == 0x1 then 
 				--should not happen!
-			elseif data.cabinet_list[right_top_elem].aux_values.row == 0x2 then 
+			elseif data.cabinet_list[right_top_elem].row == 0x2 then 
 				swap_wall_wall(data, cur_elem, right_top_elem)
-			elseif data.cabinet_list[right_top_elem].aux_values.row == 0x3 then 
+			elseif data.cabinet_list[right_top_elem].row == 0x3 then 
 				--Any wall cabinet with a high cabinet as a neighbor was created in relation to this. Thus, it can be trated like the wall-wall case				
 				swap_wall_wall(data, cur_elem, right_top_elem)
 			end
 			data.current_cabinet = right_top_elem
 		end
-	elseif data.cabinet_list[cur_elem].aux_values.row == 0x3 then 
-		local right_elem = data.cabinet_list[cur_elem].aux_values.right_element
+	elseif data.cabinet_list[cur_elem].row == 0x3 then 
+		local right_elem = data.cabinet_list[cur_elem].right_element
 		if data.cabinet_list[right_elem] ~= nil then 
-			if data.cabinet_list[right_elem].aux_values.row == 0x1 then 
-				local top_elem = data.cabinet_list[right_elem].aux_values.top_element
+			if data.cabinet_list[right_elem].row == 0x1 then 
+				local top_elem = data.cabinet_list[right_elem].top_element
 				data.cabinet_list[right_elem], data.cabinet_list[cur_elem] = data.cabinet_list[cur_elem], data.cabinet_list[right_elem]
 				--now correct again fo the neighbors
-				data.cabinet_list[right_elem].aux_values.left_element, data.cabinet_list[cur_elem].aux_values.left_element = data.cabinet_list[cur_elem].aux_values.left_element, data.cabinet_list[right_elem].aux_values.left_element
-				data.cabinet_list[right_elem].aux_values.right_element, data.cabinet_list[cur_elem].aux_values.right_element = data.cabinet_list[cur_elem].aux_values.right_element, data.cabinet_list[right_elem].aux_values.right_element
+				data.cabinet_list[right_elem].left_element, data.cabinet_list[cur_elem].left_element = data.cabinet_list[cur_elem].left_element, data.cabinet_list[right_elem].left_element
+				data.cabinet_list[right_elem].right_element, data.cabinet_list[cur_elem].right_element = data.cabinet_list[cur_elem].right_element, data.cabinet_list[right_elem].right_element
 				 
 				if top_elem ~= nil then 
-					data.cabinet_list[right_elem].aux_values.left_top_element, data.cabinet_list[top_elem].aux_values.left_top_element = data.cabinet_list[top_elem].aux_values.left_top_element, data.cabinet_list[right_elem].aux_values.left_top_element
-					data.cabinet_list[right_elem].aux_values.right_top_element, data.cabinet_list[top_elem].aux_values.right_top_element = data.cabinet_list[top_elem].aux_values.right_top_element, data.cabinet_list[right_elem].aux_values.right_top_element
+					data.cabinet_list[right_elem].left_top_element, data.cabinet_list[top_elem].left_top_element = data.cabinet_list[top_elem].left_top_element, data.cabinet_list[right_elem].left_top_element
+					data.cabinet_list[right_elem].right_top_element, data.cabinet_list[top_elem].right_top_element = data.cabinet_list[top_elem].right_top_element, data.cabinet_list[right_elem].right_top_element
 				end
-			elseif data.cabinet_list[right_elem].aux_values.row == 0x2 then 
+			elseif data.cabinet_list[right_elem].row == 0x2 then 
 				--should not happen!
-			elseif data.cabinet_list[right_elem].aux_values.row == 0x3 then 
+			elseif data.cabinet_list[right_elem].row == 0x3 then 
 				swap_high_high(data, cur_elem, right_elem)
 			end
 			data.current_cabinet = right_elem
@@ -1208,19 +1208,6 @@ specific_controls_styles.sink_orientation = {
 											return ctrl_id, label_id
 										end,}
 
-specific_controls_styles.angle = {
-	label = pyloc "Angle",
-	is_basic = true,
-	create = function(dialog_handle, label_text, data, prev_control, label_col, edit_col) 
-											label_id = dialog_handle:create_label(label_col, label_text, {insert_after = prev_control})
-											ctrl_id = dialog_handle:create_text_box(edit_col, pyui.format_number(data.cabinet_list[data.current_cabinet].angle), {insert_after = label_id}) 
-											ctrl_id:set_on_change_handler(function(text)
-												data.cabinet_list[data.current_cabinet].angle = pyui.parse_number(text) or data.cabinet_list[data.current_cabinet].angle
-												recreate_all(data, true)
-												end)
-												return ctrl_id, label_id
-											end,}
-
 
 
 function insert_specific_control(data, control_id, name)
@@ -1284,6 +1271,7 @@ function specific_details(specific_dialog, data)
 
 	specific_dialog:create_align({1,2})
 	local ok = specific_dialog:create_ok_button({1,2})
+	specific_dialog:equalize_column_widths({1, 2})
 
 
 

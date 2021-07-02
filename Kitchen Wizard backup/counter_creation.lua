@@ -170,7 +170,7 @@ function create_counter_geometry(data)
 		local dir_perp = {dir_parallel[2], -dir_parallel[1]}
 		if r > 0 and distance / r / 2 < 1 then 
 			local beta = ASIN(distance / r / 2)
-			local alpha = ACOS(math.min((0.5 * distance + counter_data.overlap_left) / r))
+			local alpha = ACOS((0.5 * distance + counter_data.overlap_left) / r)
 			local seg_count = math.max(1, math.floor(segs[1].segments * (90 - alpha - beta) / beta / 2 + 0.5))
 			local coords = {points[1][1] + dir_parallel[1] * (distance / 2 - r * COS(alpha)) + dir_perp[1] * r * (COS(beta) - SIN(alpha)),
 							points[1][2] + dir_parallel[2] * (distance / 2 - r * COS(alpha)) + dir_perp[2] * r * (COS(beta) - SIN(alpha)),
@@ -182,6 +182,8 @@ function create_counter_geometry(data)
 							points[1][2] + dir_parallel[2] * counter_data.overlap_left,
 							points[1][3]}
 			points[1] = coords	--no additional segments are created to give nicer results
+--			table.insert(points, 1, {coords[1], coords[2], coords[3]})
+--			table.insert(segs, 1, {})
 		end		
 	end
 	if counter_data.overlap_right > 0 then 
@@ -191,7 +193,7 @@ function create_counter_geometry(data)
 		local dir_perp = {dir_parallel[2], -dir_parallel[1]}
 		if r > 0 and distance / r / 2 < 1 then 
 			local beta = ASIN(distance / r / 2)
-			local alpha = ACOS(math.min((0.5 * distance + counter_data.overlap_right) / r, 1))
+			local alpha = ACOS((0.5 * distance + counter_data.overlap_right) / r)
 			local seg_count = math.max(1, math.floor(segs[#points - 1].segments * (90 - alpha - beta) / beta / 2 + 0.5))
 		
 			local coords = {points[#points][1] - dir_parallel[1] * (distance / 2 - r * COS(alpha)) + dir_perp[1] * r * (COS(beta) - SIN(alpha)),
@@ -204,6 +206,8 @@ function create_counter_geometry(data)
 							points[#points][2] + dir_parallel[2] * counter_data.overlap_right,
 							points[#points][3]}
 			points[#points] = coords
+--			table.insert(points, {coords[1], coords[2], coords[3]})
+--			table.insert(segs, #points - 1, {})
 		end
 	end
 	local w_dir = {points[1][1] - points[2][1], points[1][2] - points[2][2], 0}

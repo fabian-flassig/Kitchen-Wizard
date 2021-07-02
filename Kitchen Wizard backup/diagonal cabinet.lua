@@ -94,7 +94,7 @@ function recreate_diagonal_base(general_data, specific_data, base_height, height
 	local bottom_depth1 = carcass_depth1 - groove_dist_back_off
 	local bottom_depth2 = carcass_depth2 - groove_dist_back_off
 	
-	if specific_data.aux_values.row == 0x2 then
+	if specific_data.row == 0x2 then
 		poly_array = {{general_data.thickness, 0, 0}, 
 						{width1 - carcass_depth2, carcass_depth1 - width2 + general_data.thickness, 0}, 
 						{width1, carcass_depth1 - width2 + general_data.thickness, 0}, 
@@ -121,7 +121,7 @@ function recreate_diagonal_base(general_data, specific_data, base_height, height
 	loc_origin[1] = general_data.thickness - general_data.groove_depth
 	loc_origin[2] = door_to_carcass + carcass_depth1 - groove_dist_back_off
 	loc_origin[3] = base_height
-	if specific_data.aux_values.row == 0x2 then
+	if specific_data.row == 0x2 then
 		loc_origin[3] = base_height + general_data.thickness - general_data.groove_depth
 		back_height = height - 2 * general_data.thickness + 2 * general_data.groove_depth
 	else
@@ -166,10 +166,7 @@ local function recreate_diagonal(general_data, specific_data)
 	local drawer_height = get_drawer_heights(general_data, specific_data)
 	local loc_origin= {}
 	--if the kitchen is L-shaped. The angle is inherited from the previous cabinet
-	local door_height = height
-	if specific_data.aux_values.row == 0x1 then 
-		door_height = height - general_data.top_gap
-	end
+	local door_height = height - general_data.top_gap
 	local door_width = specific_data.door_width
 
 
@@ -229,14 +226,14 @@ local function recreate_diagonal(general_data, specific_data)
 		
 		loc_origin[3] = base_height
 		poly_array = {{general_data.gap - general_data.thickness, -general_data.door_carcass_gap - general_data.door_thickness, 0}, p_out_1, p_in_1, {general_data.gap - general_data.thickness, -general_data.door_carcass_gap, 0}}
-		create_profile_from_poly(poly_array, door_height, loc_origin, carcass_elements, "blind_front", specific_data.aux_values.row)
+		create_profile_from_poly(poly_array, door_height, loc_origin, carcass_elements, "blind_front")
 
 		local p3 = {orientation_p_left[1] - (general_data.door_carcass_gap + general_data.door_thickness) * SIN(slope_angle) - general_data.gap * COS(slope_angle), 
 					orientation_p_left[2] - (general_data.door_carcass_gap + general_data.door_thickness) * COS(slope_angle) + general_data.gap * SIN(slope_angle), 0}
 		local p4 = {orientation_p_left[1] - general_data.door_carcass_gap * SIN(slope_angle) - general_data.gap * COS(slope_angle), 
 					orientation_p_left[2] - general_data.door_carcass_gap * COS(slope_angle) + general_data.gap * SIN(slope_angle), 0}
 		poly_array = {p_out_1, p3, p4, p_in_1}
-		create_profile_from_poly(poly_array, door_height, loc_origin, carcass_elements, "blind_front", specific_data.aux_values.row)
+		create_profile_from_poly(poly_array, door_height, loc_origin, carcass_elements, "blind_front")
 
 		
 
@@ -266,14 +263,14 @@ local function recreate_diagonal(general_data, specific_data)
 		p_in_2 = {-general_data.door_carcass_gap, - general_data.door_carcass_gap * TAN(miter_angle2), 0}
 		
 		poly_array = {{-general_data.door_carcass_gap - general_data.door_thickness, general_data.gap - general_data.thickness, 0}, {-general_data.door_carcass_gap, general_data.gap - general_data.thickness, 0}, p_in_2, p_out_2}
-		create_profile_from_poly(poly_array, door_height, loc_origin, carcass_elements, "blind_front", specific_data.aux_values.row)
+		create_profile_from_poly(poly_array, door_height, loc_origin, carcass_elements, "blind_front")
 
 		p3 = {orientation_p_right[1] - (general_data.door_carcass_gap + general_data.door_thickness) * SIN(slope_angle) + general_data.gap * COS(slope_angle), 
 				orientation_p_right[2] - (general_data.door_carcass_gap + general_data.door_thickness) * COS(slope_angle) - general_data.gap * SIN(slope_angle), 0}
 		p4 = {orientation_p_right[1] - general_data.door_carcass_gap * SIN(slope_angle) + general_data.gap * COS(slope_angle), 
 				orientation_p_right[2] - general_data.door_carcass_gap * COS(slope_angle) - general_data.gap * SIN(slope_angle), 0}
 		poly_array = {p_out_2, p_in_2, p4, p3}
-		create_profile_from_poly(poly_array, door_height, loc_origin, carcass_elements, "blind_front", specific_data.aux_values.row)
+		create_profile_from_poly(poly_array, door_height, loc_origin, carcass_elements, "blind_front")
 
 
 		--Front
@@ -328,7 +325,7 @@ local function recreate_diagonal(general_data, specific_data)
 	carcass_elements = pytha.create_group(carcass_elements, {name = attribute_list["carcass"].name})	
 	table.insert(cur_elements, carcass_elements)
 	
-	if specific_data.aux_values.row ~= 0x2 then 
+	if specific_data.row ~= 0x2 then 
 		--Kickboard
 		local front_setback = general_data.thickness + general_data.kickboard_setback
 		loc_origin[1] = general_data.gap
@@ -347,10 +344,9 @@ local function recreate_diagonal(general_data, specific_data)
 						general_data.kickboard_margin}
 		poly_array = {{0, general_data.kickboard_setback, general_data.kickboard_margin}, p_out_1, p_in_1, {0, general_data.kickboard_setback + general_data.kickboard_thickness, general_data.kickboard_margin}}
 		fla_handle = pytha.create_polygon(poly_array)
-		specific_data.aux_values.kickboard_handle_left = pytha.create_profile(fla_handle, base_height - general_data.kickboard_margin)[1]
-		set_part_attributes(specific_data.aux_values.kickboard_handle_left, "kickboard")
+		specific_data.kickboard_handle_left = pytha.create_profile(fla_handle, base_height - general_data.kickboard_margin)[1]
 		pytha.delete_element(fla_handle)
-		table.insert(cur_elements, specific_data.aux_values.kickboard_handle_left)
+		table.insert(cur_elements, specific_data.kickboard_handle_left)
 		
 		
 		poly_array = {p_out_1, p_out_2, p_in_2, p_in_1}
@@ -364,15 +360,14 @@ local function recreate_diagonal(general_data, specific_data)
 		poly_array = {{specific_data.width - specific_data.depth2 + general_data.kickboard_setback, specific_data.depth - specific_data.width2, general_data.kickboard_margin}, 
 						{specific_data.width - specific_data.depth2 + general_data.kickboard_setback + general_data.kickboard_thickness, specific_data.depth - specific_data.width2, general_data.kickboard_margin}, p_in_2 , p_out_2}
 		fla_handle = pytha.create_polygon(poly_array)
-		specific_data.aux_values.kickboard_handle_right = pytha.create_profile(fla_handle, base_height - general_data.kickboard_margin)[1]
-		set_part_attributes(specific_data.aux_values.kickboard_handle_right, "kickboard")
+		specific_data.kickboard_handle_right = pytha.create_profile(fla_handle, base_height - general_data.kickboard_margin)[1]
 		pytha.delete_element(fla_handle)
-		table.insert(cur_elements, specific_data.aux_values.kickboard_handle_right)
+		table.insert(cur_elements, specific_data.kickboard_handle_right)
 	end
-	specific_data.aux_values.main_group = pytha.create_group(cur_elements)
+	specific_data.main_group = pytha.create_group(cur_elements)
 
 --Benchtop
-	if specific_data.aux_values.row == 0x1 then 
+	if specific_data.row == 0x1 then 
 		local z = general_data.benchtop_height - general_data.benchtop_thickness
 		poly_array = {{0, -general_data.top_over,z}, 
 							{specific_data.width - specific_data.depth2 - general_data.top_over, specific_data.depth - specific_data.width2, z}, 
@@ -381,19 +376,19 @@ local function recreate_diagonal(general_data, specific_data)
 							{0, specific_data.depth, z}}
 							
 		local benchtop = pytha.create_polygon(poly_array)
-		specific_data.aux_values.elem_handle_for_top = pytha.create_profile(benchtop, general_data.benchtop_thickness)[1]
+		specific_data.elem_handle_for_top = pytha.create_profile(benchtop, general_data.benchtop_thickness)[1]
 		pytha.delete_element(benchtop)
 	end
 	
-	return specific_data.aux_values.main_group
+	return specific_data.main_group
 end
 
 local function placement_diagonal(general_data, specific_data)
-	specific_data.aux_values.right_connection_point = {specific_data.width, specific_data.depth - specific_data.width2, 0}
-	specific_data.aux_values.left_connection_point = {0,specific_data.depth,0}
+	specific_data.right_connection_point = {specific_data.width, specific_data.depth - specific_data.width2, 0}
+	specific_data.left_connection_point = {0,specific_data.depth,0}
 	specific_data.origin_point = {specific_data.width, specific_data.depth, 0}
-	specific_data.aux_values.right_direction = -90
-	specific_data.aux_values.left_direction = 0
+	specific_data.right_direction = -90
+	specific_data.left_direction = 0
 end
 
 local function ui_update_diagonal(general_data, soft_update)
@@ -402,7 +397,7 @@ local function ui_update_diagonal(general_data, soft_update)
 		insert_specific_control(general_data, "width", pyloc "Left width")
 		insert_specific_control(general_data, "width2", pyloc "Right width")
 		insert_specific_control(general_data, "height", nil)
---		insert_specific_control(general_data, "drawer_height_list", pyloc "Drawer height")
+		insert_specific_control(general_data, "drawer_height_list", pyloc "Drawer height")
 		insert_specific_control(general_data, "door_width", nil)
 		insert_specific_control(general_data, "depth", nil)
 		insert_specific_control(general_data, "depth2", nil)
@@ -417,7 +412,7 @@ if cabinet_typelist == nil then
 end
 cabinet_typelist.diagonal = 				
 {									
-	name = pyloc "Diagonal",
+	name = pyloc "Diagonal cabinet",
 	row = 0x1,
 	default_data = {width = 1000, 
 					width2 = 1000,
@@ -437,7 +432,7 @@ cabinet_typelist.diagonal =
 }
 cabinet_typelist.diagonal_high = 				
 {									
-	name = pyloc "Diagonal high",
+	name = pyloc "Diagonal high cabinet",
 	row = 0x3,
 	default_data = {width = 1000, 
 					width2 = 1000,
@@ -456,7 +451,7 @@ cabinet_typelist.diagonal_high =
 
 cabinet_typelist.diagonal_wall = 				
 {									
-	name = pyloc "Diagonal wall",
+	name = pyloc "Diagonal wall cabinet",
 	row = 0x2,
 	default_data = function(general_data, specific_data) specific_data.width = 650
 														specific_data.width2 = 650

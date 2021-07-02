@@ -195,7 +195,7 @@ local function recreate_corner(general_data, specific_data)
 							{l_piece_length - general_data.gap - general_data.door_carcass_gap, 0, 0}}
 		local corner_face = pytha.create_polygon(p_array)
 		local corner_angle =  pytha.create_profile(corner_face, specific_data.height - general_data.top_gap)[1]
-		set_part_attributes(corner_angle, "corner_angle")
+		set_part_attributes(new_elem, "corner_angle")
 		table.insert(carcass_elements, corner_angle)
 		pytha.delete_element(corner_face)
 		loc_origin[1] = specific_data.width - specific_data.door_width - l_piece_length + general_data.door_carcass_gap
@@ -208,7 +208,7 @@ local function recreate_corner(general_data, specific_data)
 					{general_data.thickness, -general_data.thickness, 0}}
 		corner_face = pytha.create_polygon(p_array)
 		corner_angle =  pytha.create_profile(corner_face, specific_data.height - general_data.top_gap)[1]
-		set_part_attributes(corner_angle, "corner_angle")
+		set_part_attributes(new_elem, "corner_angle")
 		table.insert(carcass_elements, corner_angle)
 		pytha.delete_element(corner_face)
 		loc_origin[1] = specific_data.width - specific_data.door_width  - l_piece_length + general_data.door_carcass_gap
@@ -222,7 +222,7 @@ local function recreate_corner(general_data, specific_data)
 						{l_piece_length - general_data.gap - general_data.door_carcass_gap, 0, 0}}
 		local corner_face = pytha.create_polygon(p_array)
 		local corner_angle =  pytha.create_profile(corner_face, specific_data.height - general_data.top_gap)[1]
-		set_part_attributes(corner_angle, "corner_angle")
+		set_part_attributes(new_elem, "corner_angle")
 		table.insert(carcass_elements, corner_angle)
 		pytha.delete_element(corner_face)
 		loc_origin[1] = specific_data.door_width + general_data.gap
@@ -235,7 +235,7 @@ local function recreate_corner(general_data, specific_data)
 						{l_piece_length - general_data.gap, 0, 0}}
 		corner_face = pytha.create_polygon(p_array)
 		corner_angle =  pytha.create_profile(corner_face, specific_data.height - general_data.top_gap)[1]
-		set_part_attributes(corner_angle, "corner_angle")
+		set_part_attributes(new_elem, "corner_angle")
 		table.insert(carcass_elements, corner_angle)
 		pytha.delete_element(corner_face)
 		loc_origin[1] = specific_data.door_width + general_data.gap - general_data.door_carcass_gap
@@ -262,27 +262,27 @@ local function recreate_corner(general_data, specific_data)
 	loc_origin[3] = general_data.kickboard_margin
 	if specific_data.door_rh == false then
 		loc_origin[1] = specific_data.width - specific_data.door_width - l_piece_length - general_data.kickboard_thickness - general_data.kickboard_setback
-		specific_data.aux_values.kickboard_handle_right = pytha.create_block(specific_data.door_width + l_piece_length + general_data.kickboard_thickness + general_data.kickboard_setback, 
+		specific_data.kickboard_handle_right = pytha.create_block(specific_data.door_width + l_piece_length + general_data.kickboard_thickness + general_data.kickboard_setback, 
 																general_data.kickboard_thickness, base_height - general_data.kickboard_margin, loc_origin)
-																set_part_attributes(specific_data.aux_values.kickboard_handle_right, "kickboard")
+																set_part_attributes(new_elem, "kickboard")
 		loc_origin[2] = - l_piece_length
-		specific_data.aux_values.kickboard_handle_left = pytha.create_block(general_data.kickboard_thickness, l_piece_length + general_data.kickboard_setback, 
+		specific_data.kickboard_handle_left = pytha.create_block(general_data.kickboard_thickness, l_piece_length + general_data.kickboard_setback, 
 																base_height - general_data.kickboard_margin, loc_origin)
-																set_part_attributes(specific_data.aux_values.kickboard_handle_left, "kickboard")
+																set_part_attributes(new_elem, "kickboard")
 	else
 		loc_origin[1] = 0
 		loc_origin[2] = general_data.kickboard_setback
-		specific_data.aux_values.kickboard_handle_left = pytha.create_block(specific_data.door_width + l_piece_length + general_data.kickboard_thickness + general_data.kickboard_setback, 
+		specific_data.kickboard_handle_left = pytha.create_block(specific_data.door_width + l_piece_length + general_data.kickboard_thickness + general_data.kickboard_setback, 
 																general_data.kickboard_thickness, base_height - general_data.kickboard_margin, loc_origin)
-																set_part_attributes(specific_data.aux_values.kickboard_handle_left, "kickboard")
+																set_part_attributes(new_elem, "kickboard")
 		loc_origin[1] = specific_data.door_width + l_piece_length + general_data.kickboard_setback
 		loc_origin[2] = - l_piece_length
-		specific_data.aux_values.kickboard_handle_right = pytha.create_block(general_data.kickboard_thickness, l_piece_length + general_data.kickboard_setback, 
+		specific_data.kickboard_handle_right = pytha.create_block(general_data.kickboard_thickness, l_piece_length + general_data.kickboard_setback, 
 																base_height - general_data.kickboard_margin, loc_origin)
-																set_part_attributes(specific_data.aux_values.kickboard_handle_right, "kickboard")
+																set_part_attributes(new_elem, "kickboard")
 	end
-	table.insert(cur_elements, specific_data.aux_values.kickboard_handle_left)
-	table.insert(cur_elements, specific_data.aux_values.kickboard_handle_right)
+	table.insert(cur_elements, specific_data.kickboard_handle_left)
+	table.insert(cur_elements, specific_data.kickboard_handle_right)
 		
 
 	
@@ -305,29 +305,29 @@ local function recreate_corner(general_data, specific_data)
 	end
 	
 	
-	specific_data.aux_values.main_group = pytha.create_group(cur_elements)
+	specific_data.main_group = pytha.create_group(cur_elements)
 	
 	local benchtop = pytha.create_polygon(poly_array)
-	specific_data.aux_values.elem_handle_for_top = pytha.create_profile(benchtop, general_data.benchtop_thickness)[1]
+	specific_data.elem_handle_for_top = pytha.create_profile(benchtop, general_data.benchtop_thickness)[1]
 	pytha.delete_element(benchtop)
 	
-	return specific_data.aux_values.main_group
+	return specific_data.main_group
 end
 
 local function placement_corner(general_data, specific_data)
 	local l_piece_length = get_l_piece_length(general_data, specific_data) 
 	if specific_data.door_rh == false then
-		specific_data.aux_values.right_connection_point = {specific_data.width, specific_data.depth, 0}
-		specific_data.aux_values.left_connection_point = {specific_data.width - specific_data.door_width - l_piece_length - specific_data.depth, -l_piece_length,0}
+		specific_data.right_connection_point = {specific_data.width, specific_data.depth, 0}
+		specific_data.left_connection_point = {specific_data.width - specific_data.door_width - l_piece_length - specific_data.depth, -l_piece_length,0}
 		specific_data.origin_point = {specific_data.width - specific_data.door_width - l_piece_length - specific_data.depth, specific_data.depth, 0}
-		specific_data.aux_values.right_direction = 0
-		specific_data.aux_values.left_direction = 90
+		specific_data.right_direction = 0
+		specific_data.left_direction = 90
 	else
-		specific_data.aux_values.right_connection_point = {specific_data.door_width + l_piece_length + specific_data.depth, -l_piece_length, 0}
-		specific_data.aux_values.left_connection_point = {0, specific_data.depth,0}
+		specific_data.right_connection_point = {specific_data.door_width + l_piece_length + specific_data.depth, -l_piece_length, 0}
+		specific_data.left_connection_point = {0, specific_data.depth,0}
 		specific_data.origin_point = {specific_data.door_width + l_piece_length + specific_data.depth, specific_data.depth, 0}
-		specific_data.aux_values.right_direction = -90
-		specific_data.aux_values.left_direction = 0
+		specific_data.right_direction = -90
+		specific_data.left_direction = 0
 	end
 end
 
@@ -355,7 +355,7 @@ if cabinet_typelist == nil then
 end
 cabinet_typelist.corner = 				
 {									
-	name = pyloc "Corner",
+	name = pyloc "Corner cabinet",
 	row = 0x1,
 	default_data = {width = 1000,  
 					width2 = 650,

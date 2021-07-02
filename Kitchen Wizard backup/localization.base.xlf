@@ -1,9 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xliff srcLang="en-US" version="2.0" xmlns="urn:oasis:names:tc:xliff:document:2.0">
   <file original="appliance_loading.lua">
+    <unit id="2d08177684fc19b3">
+      <segment>
+        <source>No sink</source>
+      </segment>
+    </unit>
     <unit id="14723137c0684944">
       <segment>
         <source>--Browse--</source>
+      </segment>
+    </unit>
+    <unit id="2f8289c6abeb9c7d">
+      <segment>
+        <source>No hob</source>
+      </segment>
+    </unit>
+    <unit id="14723137c0684944">
+      <segment>
+        <source>--Browse--</source>
+      </segment>
+    </unit>
+    <unit id="4233fb5d59671b81">
+      <segment>
+        <source>No oven</source>
+      </segment>
+    </unit>
+    <unit id="14723137c0684944">
+      <segment>
+        <source>--Browse--</source>
+      </segment>
+    </unit>
+    <unit id="4233fb5d59671b81">
+      <segment>
+        <source>No oven</source>
+      </segment>
+    </unit>
+    <unit id="14723137c0684944">
+      <segment>
+        <source>--Browse--</source>
+      </segment>
+    </unit>
+    <unit id="7ee57d10a5f4ccb6">
+      <segment>
+        <source>No fridge</source>
       </segment>
     </unit>
     <unit id="14723137c0684944">
@@ -13,16 +53,6 @@
     </unit>
   </file>
   <file original="auxiliary_dialogs.lua">
-    <unit id="1b0966d68781b4be">
-      <segment>
-        <source>Kitchen Wizard</source>
-      </segment>
-    </unit>
-    <unit id="0a47343a8d7dc6a6">
-      <segment>
-        <source>Really exit Kitchen Wizard?</source>
-      </segment>
-    </unit>
     <unit id="539b42e57879ae40">
       <segment>
         <source>Kitchen Element Settings</source>
@@ -56,16 +86,6 @@
     <unit id="58280c3fb67ab903">
       <segment>
         <source>Linetype</source>
-      </segment>
-    </unit>
-    <unit id="66d0987d87cb5c99">
-      <segment>
-        <source>Materials</source>
-      </segment>
-    </unit>
-    <unit id="1265b44d74436391">
-      <segment>
-        <source>Element type</source>
       </segment>
     </unit>
     <unit id="36bcb5720394fa52">
@@ -128,6 +148,11 @@
         <source>Gaps</source>
       </segment>
     </unit>
+    <unit id="675e58cd8d7803da">
+      <segment>
+        <source>Shelves Setback</source>
+      </segment>
+    </unit>
     <unit id="6406b28c70e0f709">
       <segment>
         <source>Horizontal Rail Width</source>
@@ -138,24 +163,9 @@
         <source>Vertical Rail Width</source>
       </segment>
     </unit>
-    <unit id="3845783c0645b591">
+    <unit id="789fb47bfa29ed5a">
       <segment>
-        <source>Shelves Tolerance</source>
-      </segment>
-    </unit>
-    <unit id="675e58cd8d7803da">
-      <segment>
-        <source>Shelves Setback</source>
-      </segment>
-    </unit>
-    <unit id="675e58cd8d7803da">
-      <segment>
-        <source>Shelves Setback</source>
-      </segment>
-    </unit>
-    <unit id="119cc8c0e25c98c6">
-      <segment>
-        <source>Create Drawing Symbols</source>
+        <source>Shelf Tolerance</source>
       </segment>
     </unit>
     <unit id="75720c9219489bba">
@@ -233,11 +243,6 @@
         <source>Knob</source>
       </segment>
     </unit>
-    <unit id="3849ba0fd35133c5">
-      <segment>
-        <source>From library</source>
-      </segment>
-    </unit>
     <unit id="10e032ac73b37128">
       <segment>
         <source>Handle orientation</source>
@@ -278,16 +283,6 @@
         <source>Handle length</source>
       </segment>
     </unit>
-    <unit id="75d1f964a33f406c">
-      <segment>
-        <source>Handle from library</source>
-      </segment>
-    </unit>
-    <unit id="2b70f94f6f2eec5b">
-      <segment>
-        <source>Browse</source>
-      </segment>
-    </unit>
     <unit id="0b8ec0e8258e8675">
       <segment>
         <source>Front Panels</source>
@@ -311,26 +306,6 @@
     <unit id="4b3cd1bccb33f4a8">
       <segment>
         <source>Central panel thickness</source>
-      </segment>
-    </unit>
-    <unit id="6efe1fa2f1d39114">
-      <segment>
-        <source>Panel from library</source>
-      </segment>
-    </unit>
-    <unit id="2b70f94f6f2eec5b">
-      <segment>
-        <source>Browse</source>
-      </segment>
-    </unit>
-    <unit id="2b70f94f6f2eec5b">
-      <segment>
-        <source>Browse</source>
-      </segment>
-    </unit>
-    <unit id="2b70f94f6f2eec5b">
-      <segment>
-        <source>Browse</source>
       </segment>
     </unit>
   </file>
@@ -372,29 +347,9 @@
         <source>Sink model</source>
       </segment>
     </unit>
-    <unit id="2d08177684fc19b3">
-      <segment>
-        <source>No sink</source>
-      </segment>
-    </unit>
-    <unit id="78cdfaad4c07b396">
-      <segment>
-        <source>Garbage bin model</source>
-      </segment>
-    </unit>
-    <unit id="03137044508e5d49">
-      <segment>
-        <source>No garbage bin</source>
-      </segment>
-    </unit>
     <unit id="1799d238d22ca26c">
       <segment>
         <source>Hob model</source>
-      </segment>
-    </unit>
-    <unit id="2f8289c6abeb9c7d">
-      <segment>
-        <source>No hob</source>
       </segment>
     </unit>
     <unit id="6287fcb23f3b8868">
@@ -407,19 +362,19 @@
         <source>Ventilation Gap</source>
       </segment>
     </unit>
-    <unit id="389f6987d5b3ac8b">
+    <unit id="06927eca2e5929da">
       <segment>
-        <source>Base</source>
+        <source>Base cabinet</source>
       </segment>
     </unit>
-    <unit id="3867ed926bb14e75">
+    <unit id="7b7f3feb1da95caf">
       <segment>
-        <source>Sink</source>
+        <source>Sink cabinet</source>
       </segment>
     </unit>
-    <unit id="034fc03c7adf6555">
+    <unit id="6932c087e4cd1fb7">
       <segment>
-        <source>Hob</source>
+        <source>Hob cabinet</source>
       </segment>
     </unit>
     <unit id="611efe5702be1757">
@@ -432,14 +387,9 @@
         <source>Dishwasher</source>
       </segment>
     </unit>
-    <unit id="1490ce4c0a223eb3">
+    <unit id="3315ffef6ac2e63c">
       <segment>
-        <source>Low fridge</source>
-      </segment>
-    </unit>
-    <unit id="1747b9cd5b4a9e43">
-      <segment>
-        <source>Wall Empty</source>
+        <source>Low fridge cabinet</source>
       </segment>
     </unit>
   </file>
@@ -454,19 +404,9 @@
         <source>Hob model</source>
       </segment>
     </unit>
-    <unit id="2f8289c6abeb9c7d">
+    <unit id="3c86dcdd6858c748">
       <segment>
-        <source>No hob</source>
-      </segment>
-    </unit>
-    <unit id="4233fb5d59671b81">
-      <segment>
-        <source>No oven</source>
-      </segment>
-    </unit>
-    <unit id="7b8d850b79bc283a">
-      <segment>
-        <source>Hob and oven</source>
+        <source>Hob and oven cabinet</source>
       </segment>
     </unit>
   </file>
@@ -481,9 +421,9 @@
         <source>Door width</source>
       </segment>
     </unit>
-    <unit id="039ba25fa3e04293">
+    <unit id="72c131018f474020">
       <segment>
-        <source>Corner</source>
+        <source>Corner cabinet</source>
       </segment>
     </unit>
   </file>
@@ -498,9 +438,9 @@
         <source>Right width</source>
       </segment>
     </unit>
-    <unit id="27b4b095e32b1c94">
+    <unit id="42f2e0504747156d">
       <segment>
-        <source>Corner wall</source>
+        <source>Corner wall cabinet</source>
       </segment>
     </unit>
   </file>
@@ -732,6 +672,16 @@
         <source>Fingerpull Rail</source>
       </segment>
     </unit>
+    <unit id="791ecea67b5f28db">
+      <segment>
+        <source>Front Panel</source>
+      </segment>
+    </unit>
+    <unit id="791ecea67b5f28db">
+      <segment>
+        <source>Front Panel</source>
+      </segment>
+    </unit>
     <unit id="1dec12543bb2eef7">
       <segment>
         <source>Cleat</source>
@@ -740,6 +690,16 @@
     <unit id="1dec12543bb2eef7">
       <segment>
         <source>Cleat</source>
+      </segment>
+    </unit>
+    <unit id="56d01bad19a25252">
+      <segment>
+        <source>Filler</source>
+      </segment>
+    </unit>
+    <unit id="56d01bad19a25252">
+      <segment>
+        <source>Filler</source>
       </segment>
     </unit>
     <unit id="331f60d771f2aab7">
@@ -750,6 +710,16 @@
     <unit id="331f60d771f2aab7">
       <segment>
         <source>Blind Panel</source>
+      </segment>
+    </unit>
+    <unit id="3867ed926bb14e75">
+      <segment>
+        <source>Sink</source>
+      </segment>
+    </unit>
+    <unit id="3867ed926bb14e75">
+      <segment>
+        <source>Sink</source>
       </segment>
     </unit>
     <unit id="1f77ce3de5ca9b2d">
@@ -782,6 +752,16 @@
         <source>Light_375</source>
       </segment>
     </unit>
+    <unit id="192861b4bb767014">
+      <segment>
+        <source>Front</source>
+      </segment>
+    </unit>
+    <unit id="192861b4bb767014">
+      <segment>
+        <source>Front</source>
+      </segment>
+    </unit>
     <unit id="2a0257a5db1f463a">
       <segment>
         <source>Handle</source>
@@ -790,6 +770,16 @@
     <unit id="2a0257a5db1f463a">
       <segment>
         <source>Handle</source>
+      </segment>
+    </unit>
+    <unit id="391894c01d34875e">
+      <segment>
+        <source>Drawer Bottom</source>
+      </segment>
+    </unit>
+    <unit id="391894c01d34875e">
+      <segment>
+        <source>Drawer Bottom</source>
       </segment>
     </unit>
     <unit id="038ecddb0e4f234f">
@@ -800,6 +790,36 @@
     <unit id="038ecddb0e4f234f">
       <segment>
         <source>Drawer Front</source>
+      </segment>
+    </unit>
+    <unit id="5e13f99820f74a71">
+      <segment>
+        <source>Drawer Left</source>
+      </segment>
+    </unit>
+    <unit id="5e13f99820f74a71">
+      <segment>
+        <source>Drawer Left</source>
+      </segment>
+    </unit>
+    <unit id="25d6a2af321f89c5">
+      <segment>
+        <source>Drawer Right</source>
+      </segment>
+    </unit>
+    <unit id="25d6a2af321f89c5">
+      <segment>
+        <source>Drawer Right</source>
+      </segment>
+    </unit>
+    <unit id="738568cfe1d5f010">
+      <segment>
+        <source>Drawer Back</source>
+      </segment>
+    </unit>
+    <unit id="738568cfe1d5f010">
+      <segment>
+        <source>Drawer Back</source>
       </segment>
     </unit>
     <unit id="08f4a1ec83aa25fa">
@@ -1010,86 +1030,6 @@
     <unit id="6984236b48dae515">
       <segment>
         <source>Fridge</source>
-      </segment>
-    </unit>
-    <unit id="7320ec3eb4e32cd9">
-      <segment>
-        <source>Splashback</source>
-      </segment>
-    </unit>
-    <unit id="7320ec3eb4e32cd9">
-      <segment>
-        <source>Splashback</source>
-      </segment>
-    </unit>
-    <unit id="2df77a7c0318299b">
-      <segment>
-        <source>Wall Edging Trim</source>
-      </segment>
-    </unit>
-    <unit id="2df77a7c0318299b">
-      <segment>
-        <source>Wall Edging Trim</source>
-      </segment>
-    </unit>
-    <unit id="78e3f165a521ee4e">
-      <segment>
-        <source>Carcass elements</source>
-      </segment>
-    </unit>
-    <unit id="34c449bc0ad858d5">
-      <segment>
-        <source>Front Base</source>
-      </segment>
-    </unit>
-    <unit id="6e052bc5512d9f6a">
-      <segment>
-        <source>Front Wall</source>
-      </segment>
-    </unit>
-    <unit id="23bd48560ad1550c">
-      <segment>
-        <source>Front High</source>
-      </segment>
-    </unit>
-    <unit id="1f77ce3de5ca9b2d">
-      <segment>
-        <source>Kickboard</source>
-      </segment>
-    </unit>
-    <unit id="75720c9219489bba">
-      <segment>
-        <source>Benchtop</source>
-      </segment>
-    </unit>
-    <unit id="2a0257a5db1f463a">
-      <segment>
-        <source>Handle</source>
-      </segment>
-    </unit>
-    <unit id="5996c06d28cdfe91">
-      <segment>
-        <source>Fume Hood</source>
-      </segment>
-    </unit>
-    <unit id="1e486b029d52bbcc">
-      <segment>
-        <source>End</source>
-      </segment>
-    </unit>
-    <unit id="0b966f6cb31b4cea">
-      <segment>
-        <source>Counter Wall</source>
-      </segment>
-    </unit>
-    <unit id="22667c34ecc9b71f">
-      <segment>
-        <source>Counter Top</source>
-      </segment>
-    </unit>
-    <unit id="2e6a8005012f3bf9">
-      <segment>
-        <source>Spashback</source>
       </segment>
     </unit>
     <unit id="3304ad5481e19eba">
@@ -1109,19 +1049,24 @@
         <source>Right width</source>
       </segment>
     </unit>
-    <unit id="11fd40b1c3017f7b">
+    <unit id="785ecb317bfb3682">
       <segment>
-        <source>Diagonal</source>
+        <source>Drawer height</source>
       </segment>
     </unit>
-    <unit id="7e7a03509c4fbbb0">
+    <unit id="3c20ac61eba2df49">
       <segment>
-        <source>Diagonal high</source>
+        <source>Diagonal cabinet</source>
       </segment>
     </unit>
-    <unit id="5362be40bccd437f">
+    <unit id="0381e8a3da5c14d7">
       <segment>
-        <source>Diagonal wall</source>
+        <source>Diagonal high cabinet</source>
+      </segment>
+    </unit>
+    <unit id="499edc64a8da729a">
+      <segment>
+        <source>Diagonal wall cabinet</source>
       </segment>
     </unit>
   </file>
@@ -1146,11 +1091,6 @@
         <source>Orient leftwards</source>
       </segment>
     </unit>
-    <unit id="58faa35712a015e0">
-      <segment>
-        <source>General settings</source>
-      </segment>
-    </unit>
     <unit id="1b46b77e0b7dbbe5">
       <segment>
         <source>Benchtop height</source>
@@ -1166,19 +1106,14 @@
         <source>Handles and panels</source>
       </segment>
     </unit>
+    <unit id="58faa35712a015e0">
+      <segment>
+        <source>General settings</source>
+      </segment>
+    </unit>
     <unit id="5c80f2bcadea561e">
       <segment>
         <source>Counter</source>
-      </segment>
-    </unit>
-    <unit id="66d0987d87cb5c99">
-      <segment>
-        <source>Materials</source>
-      </segment>
-    </unit>
-    <unit id="7320ec3eb4e32cd9">
-      <segment>
-        <source>Splashback</source>
       </segment>
     </unit>
     <unit id="029121b90e1a0b3a">
@@ -1186,9 +1121,9 @@
         <source>This cabinet</source>
       </segment>
     </unit>
-    <unit id="3fbd2660ea05d1af">
+    <unit id="0a6ba767ee963b53">
       <segment>
-        <source>Cabinet type</source>
+        <source>Type</source>
       </segment>
     </unit>
     <unit id="0cbdde1783d03dd2">
@@ -1396,11 +1331,6 @@
         <source>flipped, right</source>
       </segment>
     </unit>
-    <unit id="5244cf79a2a28da5">
-      <segment>
-        <source>Angle</source>
-      </segment>
-    </unit>
     <unit id="4a103895ff79fea0">
       <segment>
         <source>Details of cabinet</source>
@@ -1423,11 +1353,6 @@
         <source>Frame 2</source>
       </segment>
     </unit>
-    <unit id="3849ba0fd35133c5">
-      <segment>
-        <source>From library</source>
-      </segment>
-    </unit>
   </file>
   <file original="end piece.lua">
     <unit id="2801b0a0dbedae94">
@@ -1448,16 +1373,6 @@
     <unit id="705c8ec629db0284">
       <segment>
         <source>Length of inner end</source>
-      </segment>
-    </unit>
-    <unit id="636fb763b39f8669">
-      <segment>
-        <source>Excess length left</source>
-      </segment>
-    </unit>
-    <unit id="3da873dbf3902114">
-      <segment>
-        <source>Excess length right</source>
       </segment>
     </unit>
     <unit id="18e642e05ebf176b">
@@ -1488,21 +1403,6 @@
     <unit id="05eddd2f9cb8a800">
       <segment>
         <source>Wall Filler</source>
-      </segment>
-    </unit>
-    <unit id="6aeab1bd70f4ee70">
-      <segment>
-        <source>Angle Filler</source>
-      </segment>
-    </unit>
-    <unit id="25abef5fba56e2c1">
-      <segment>
-        <source>High Angle Filler</source>
-      </segment>
-    </unit>
-    <unit id="04e281ff3f7de438">
-      <segment>
-        <source>Wall Angle Filler</source>
       </segment>
     </unit>
   </file>
@@ -1646,11 +1546,6 @@
         <source>Oven model</source>
       </segment>
     </unit>
-    <unit id="4233fb5d59671b81">
-      <segment>
-        <source>No oven</source>
-      </segment>
-    </unit>
     <unit id="6d2b3e96f389c05f">
       <segment>
         <source>Lower section height</source>
@@ -1666,11 +1561,6 @@
         <source>Fridge model</source>
       </segment>
     </unit>
-    <unit id="7ee57d10a5f4ccb6">
-      <segment>
-        <source>No fridge</source>
-      </segment>
-    </unit>
     <unit id="6d2b3e96f389c05f">
       <segment>
         <source>Lower section height</source>
@@ -1681,29 +1571,24 @@
         <source>Microwave model</source>
       </segment>
     </unit>
-    <unit id="70cd48ab5fca945f">
+    <unit id="1de85576286ebce3">
       <segment>
-        <source>No 2nd applicance</source>
+        <source>High cabinet</source>
       </segment>
     </unit>
-    <unit id="7b289bf3d98caf11">
+    <unit id="2703fd6017424c17">
       <segment>
-        <source>High</source>
+        <source>High oven cabinet</source>
       </segment>
     </unit>
-    <unit id="18c2001c3702e54c">
+    <unit id="7bf5a4e2d5d2e602">
       <segment>
-        <source>High oven</source>
+        <source>High oven&amp;microwave cabinet</source>
       </segment>
     </unit>
-    <unit id="78bba546ffba49c3">
+    <unit id="16cb56fe1fb3bc2e">
       <segment>
-        <source>High oven&amp;microwave</source>
-      </segment>
-    </unit>
-    <unit id="1469a6c6fd8d48db">
-      <segment>
-        <source>High fridge</source>
+        <source>High fridge cabinet</source>
       </segment>
     </unit>
   </file>
@@ -1724,47 +1609,10 @@
       </segment>
     </unit>
   </file>
-  <file original="splashback.lua">
-    <unit id="7320ec3eb4e32cd9">
-      <segment>
-        <source>Splashback</source>
-      </segment>
-    </unit>
-    <unit id="7320ec3eb4e32cd9">
-      <segment>
-        <source>Splashback</source>
-      </segment>
-    </unit>
-    <unit id="5583a16515d030f6">
-      <segment>
-        <source>Wall edging trim</source>
-      </segment>
-    </unit>
-    <unit id="09f6abc89b97d629">
-      <segment>
-        <source>Splashback thickness</source>
-      </segment>
-    </unit>
-    <unit id="6f2c50f3b749f340">
-      <segment>
-        <source>Gap to wall cabinets</source>
-      </segment>
-    </unit>
-    <unit id="5f2e9b3b9695d3e1">
-      <segment>
-        <source>Wall edging thickness</source>
-      </segment>
-    </unit>
-    <unit id="3091cac651b0cce6">
-      <segment>
-        <source>Wall edging height</source>
-      </segment>
-    </unit>
-  </file>
   <file original="top_cabinet.lua">
-    <unit id="7bbd679de253314a">
+    <unit id="18edb80344372714">
       <segment>
-        <source>Top</source>
+        <source>Top cabinet</source>
       </segment>
     </unit>
   </file>
@@ -1801,9 +1649,9 @@
     </unit>
   </file>
   <file original="wall_cabinet.lua">
-    <unit id="01d867d48790a95d">
+    <unit id="414a15d4f4a4c529">
       <segment>
-        <source>Wall</source>
+        <source>Wall cabinet</source>
       </segment>
     </unit>
   </file>

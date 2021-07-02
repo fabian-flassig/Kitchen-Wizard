@@ -3,7 +3,7 @@
 local function recreate_top(general_data, specific_data)
 
 	local cur_elements = {}
-	specific_data.aux_values.elem_handle_for_top = nil
+	specific_data.elem_handle_for_top = nil
 	local base_height = general_data.benchtop_height
 	local height = specific_data.height_top - base_height
 	
@@ -28,15 +28,15 @@ local function recreate_top(general_data, specific_data)
 	carcass_elements = pytha.create_group(carcass_elements, {name = attribute_list["carcass"].name})	
 	table.insert(cur_elements, carcass_elements)
 
-	specific_data.aux_values.main_group = pytha.create_group(cur_elements)
-	return specific_data.aux_values.main_group
+	specific_data.main_group = pytha.create_group(cur_elements)
+	return specific_data.main_group
 end
 
 local function placement_top(general_data, specific_data)
-	specific_data.aux_values.right_connection_point = {specific_data.width, specific_data.depth,0}
-	specific_data.aux_values.left_connection_point = {0, specific_data.depth,0}
-	specific_data.aux_values.right_direction = 0
-	specific_data.aux_values.left_direction = 0
+	specific_data.right_connection_point = {specific_data.width, specific_data.depth,0}
+	specific_data.left_connection_point = {0, specific_data.depth,0}
+	specific_data.right_direction = 0
+	specific_data.left_direction = 0
 end
 
 local function ui_update_top(general_data, soft_update)
@@ -58,7 +58,7 @@ if cabinet_typelist == nil then
 end
 cabinet_typelist.top = 				
 {									
-	name = pyloc "Top",
+	name = pyloc "Top cabinet",
 	row = 0x2,
 	default_data = function(general_data, specific_data) specific_data.width = 600
 														specific_data.depth = general_data.depth_wall

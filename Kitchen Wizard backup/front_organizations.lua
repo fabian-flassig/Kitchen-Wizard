@@ -4,7 +4,7 @@
 local single_drawer_setup_list = {{175}, {125}, {75}, {100}, {150},}
 
 local multi_drawer_setup_list = {				-- I guess for the kitchen its better to count the drawers from the top...
-							{175,-1,-1},
+							{125,-1,-1},
 							{125,125,-1,-1},
 							{125,250,-1},
 							{-1,-1,-1},}
@@ -161,14 +161,14 @@ local function create_intelli_doors(general_data, specific_data, width, height, 
 			local door_width = width / 2 - 2 * general_data.gap
 		--left handed door
 			loc_origin[1] = general_data.gap
-			create_door_tkh(general_data, specific_data, door_width, door_height, loc_origin, false, ext_elements, base_origin)
+			create_door_tkh(general_data, specific_data, door_width, door_height, loc_origin, false, nil, ext_elements, base_origin)
 		--right handed door
 			loc_origin[1] = width - door_width - general_data.gap
-			create_door_tkh(general_data, specific_data, door_width, door_height, loc_origin, true, ext_elements, base_origin)
+			create_door_tkh(general_data, specific_data, door_width, door_height, loc_origin, true, nil, ext_elements, base_origin)
 		else
 		--only one door 
 			loc_origin[1] = general_data.gap
-			create_door_tkh(general_data, specific_data, width - 2 * general_data.gap, door_height, loc_origin, specific_data.door_rh, ext_elements, base_origin)
+			create_door_tkh(general_data, specific_data, width - 2 * general_data.gap, door_height, loc_origin, specific_data.door_rh, nil, ext_elements, base_origin)
 
 		end
 	end
@@ -261,7 +261,7 @@ local function create_drawers_tkh(general_data, specific_data, width, height, sh
 		local plan_origin = {loc_origin[1], loc_origin[2], loc_origin[3]}
 		plan_origin[1] = loc_origin[1] + (width - 2 * general_data.gap) / 2
 		plan_origin[2] = loc_origin[2] - general_data.top_over - 80 - 30 * (specific_data.drawer_count - 1) - 5
-		if general_data.drawing_symbols == true and (first_blind == false or specific_data.drawer_count > 1) then 
+		if first_blind == false or specific_data.drawer_count > 1 then 
 			plan_elem = pytha.create_polygon({{plan_origin[1], plan_origin[2], plan_origin[3]},						--Arrow plan drawing
 												{plan_origin[1] - 25, plan_origin[2], plan_origin[3]},
 												{plan_origin[1] - 25, plan_origin[2] - 50, plan_origin[3]},
@@ -287,17 +287,14 @@ local function create_drawers_tkh(general_data, specific_data, width, height, sh
 				pytha.set_element_name(drawer_elem, string.format("%s_%d", attribute_list["drawer"].name, i))
 
 				loc_origin[3] = loc_origin[3] + converted_drawer_height_list[i] + general_data.gap
-
-				if general_data.drawing_symbols == true then 
-					plan_elem = pytha.create_polygon({{plan_origin[1], plan_origin[2], plan_origin[3]},
-													{plan_origin[1], plan_origin[2] - 5, plan_origin[3]},
-													{plan_origin[1] + width - 2 * general_data.gap - 2 * (i-1) * 50, plan_origin[2] - 5, plan_origin[3]},
-													{plan_origin[1] + width - 2 * general_data.gap - 2 * (i-1) * 50, plan_origin[2], plan_origin[3]}})
-					plan_origin[1] = plan_origin[1] - 50
-					plan_origin[2] = plan_origin[2] + 30
-					set_part_attributes(plan_elem, "floor_plan")
-					table.insert(ext_elements, plan_elem)
-				end
+				plan_elem = pytha.create_polygon({{plan_origin[1], plan_origin[2], plan_origin[3]},
+												{plan_origin[1], plan_origin[2] - 5, plan_origin[3]},
+												{plan_origin[1] + width - 2 * general_data.gap - 2 * (i-1) * 50, plan_origin[2] - 5, plan_origin[3]},
+												{plan_origin[1] + width - 2 * general_data.gap - 2 * (i-1) * 50, plan_origin[2], plan_origin[3]}})
+				plan_origin[1] = plan_origin[1] - 50
+				plan_origin[2] = plan_origin[2] + 30
+				set_part_attributes(plan_elem, "floor_plan")
+				table.insert(ext_elements, plan_elem)
 			end
 		end
 		
@@ -384,31 +381,30 @@ local function create_intelli_doors_drawer_tkh(general_data, specific_data, widt
 		pytha.set_element_name(drawer_elem, string.format("%s_%d", attribute_list["drawer"].name, 1))
 
 
-		if general_data.drawing_symbols == true then 
-			loc_origin[1] = general_data.gap
-			local plan_origin = {loc_origin[1], loc_origin[2], loc_origin[3]}
-			plan_origin[1] = loc_origin[1] + (width - 2 * general_data.gap) / 2
-			plan_origin[2] = loc_origin[2] - 50 - 5
+		loc_origin[1] = general_data.gap
+		local plan_origin = {loc_origin[1], loc_origin[2], loc_origin[3]}
+		plan_origin[1] = loc_origin[1] + (width - 2 * general_data.gap) / 2
+		plan_origin[2] = loc_origin[2] - 50 - 5
 
-			plan_elem = pytha.create_polygon({{plan_origin[1], plan_origin[2], plan_origin[3]},						--Arrow plan drawing
-												{plan_origin[1] - 25, plan_origin[2], plan_origin[3]},
-												{plan_origin[1] - 25, plan_origin[2] - 50, plan_origin[3]},
-												{plan_origin[1] - 50, plan_origin[2] - 50, plan_origin[3]},
-												{plan_origin[1], plan_origin[2] - 100, plan_origin[3]},
-												{plan_origin[1] + 50, plan_origin[2] - 50, plan_origin[3]},
-												{plan_origin[1] + 25, plan_origin[2] - 50, plan_origin[3]},
-												{plan_origin[1] + 25, plan_origin[2], plan_origin[3]}})
-			set_part_attributes(plan_elem, "floor_plan")
-			table.insert(ext_elements, plan_elem)
-			plan_origin[1] = loc_origin[1]
-			plan_origin[2] = plan_origin[2] + 5
-			plan_elem = pytha.create_polygon({{plan_origin[1], plan_origin[2], plan_origin[3]},
-													{plan_origin[1], plan_origin[2] - 5, plan_origin[3]},
-													{plan_origin[1] + width - 2 * general_data.gap, plan_origin[2] - 5, plan_origin[3]},
-													{plan_origin[1] + width - 2 * general_data.gap, plan_origin[2], plan_origin[3]}})
-			set_part_attributes(plan_elem, "floor_plan")
-			table.insert(ext_elements, plan_elem)
-		end
+		plan_elem = pytha.create_polygon({{plan_origin[1], plan_origin[2], plan_origin[3]},						--Arrow plan drawing
+											{plan_origin[1] - 25, plan_origin[2], plan_origin[3]},
+											{plan_origin[1] - 25, plan_origin[2] - 50, plan_origin[3]},
+											{plan_origin[1] - 50, plan_origin[2] - 50, plan_origin[3]},
+											{plan_origin[1], plan_origin[2] - 100, plan_origin[3]},
+											{plan_origin[1] + 50, plan_origin[2] - 50, plan_origin[3]},
+											{plan_origin[1] + 25, plan_origin[2] - 50, plan_origin[3]},
+											{plan_origin[1] + 25, plan_origin[2], plan_origin[3]}})
+		set_part_attributes(plan_elem, "floor_plan")
+		table.insert(ext_elements, plan_elem)
+		plan_origin[1] = loc_origin[1]
+		plan_origin[2] = plan_origin[2] + 5
+		plan_elem = pytha.create_polygon({{plan_origin[1], plan_origin[2], plan_origin[3]},
+												{plan_origin[1], plan_origin[2] - 5, plan_origin[3]},
+												{plan_origin[1] + width - 2 * general_data.gap, plan_origin[2] - 5, plan_origin[3]},
+												{plan_origin[1] + width - 2 * general_data.gap, plan_origin[2], plan_origin[3]}})
+		set_part_attributes(plan_elem, "floor_plan")
+		table.insert(ext_elements, plan_elem)
+
 		if specific_data.fingerpull then
 			loc_origin[1] = 0
 			loc_origin[2] = general_data.door_thickness + general_data.door_carcass_gap + general_data.top_over
@@ -465,25 +461,25 @@ end
 	
 	if drawer_height > 0 then
 		local drawer_elem = nil
+		local blind_elem = nil
 		local plan_elem = nil
 		loc_origin[3] = loc_origin[3] + door_height + general_data.gap
 		loc_origin[2] = - general_data.door_carcass_gap - general_data.door_thickness
 		loc_origin[1] = general_data.gap
 		local plan_origin = {loc_origin[1], loc_origin[2], loc_origin[3]}
 
-		drawer_elem = create_blind_front(general_data, specific_data, width - 2 * general_data.gap, 
+		drawer_elem, blind_elem = create_blind_front(general_data, specific_data, width - 2 * general_data.gap, 
 										drawer_height, loc_origin, ext_elements)
-			
-		if general_data.drawing_symbols == true then 							
-			plan_origin[1] = loc_origin[1]
-			plan_origin[2] = plan_origin[2] + 5
-			plan_elem = pytha.create_polygon({{plan_origin[1], plan_origin[2], plan_origin[3]},
-													{plan_origin[1], plan_origin[2] - 5, plan_origin[3]},
-													{plan_origin[1] + width - 2 * general_data.gap, plan_origin[2] - 5, plan_origin[3]},
-													{plan_origin[1] + width - 2 * general_data.gap, plan_origin[2], plan_origin[3]}})
-			set_part_attributes(plan_elem, "floor_plan")
-			table.insert(ext_elements, plan_elem)
-		end
+										
+		plan_origin[1] = loc_origin[1]
+		plan_origin[2] = plan_origin[2] + 5
+		plan_elem = pytha.create_polygon({{plan_origin[1], plan_origin[2], plan_origin[3]},
+												{plan_origin[1], plan_origin[2] - 5, plan_origin[3]},
+												{plan_origin[1] + width - 2 * general_data.gap, plan_origin[2] - 5, plan_origin[3]},
+												{plan_origin[1] + width - 2 * general_data.gap, plan_origin[2], plan_origin[3]}})
+		set_part_attributes(plan_elem, "floor_plan")
+		table.insert(ext_elements, plan_elem)
+
 		--[[ if specific_data.fingerpull then
 			loc_origin[1] = 0
 			loc_origin[2] = general_data.door_thickness + general_data.door_carcass_gap + general_data.top_over
@@ -558,7 +554,7 @@ local function create_single_door(general_data, specific_data, width, height, sh
 		loc_origin[1] = general_data.gap
 		loc_origin[2] = - door_to_carcass
 		loc_origin[3] = 0
-		create_door_tkh(general_data, specific_data, width - 2 * general_data.gap, door_height, loc_origin, specific_data.door_rh, ext_elements, base_origin)
+		create_door_tkh(general_data, specific_data, width - 2 * general_data.gap, door_height, loc_origin, specific_data.door_rh, nil, ext_elements, base_origin)
 
 	end
 end
@@ -618,30 +614,29 @@ local function create_single_door_and_drawer(general_data, specific_data, width,
 		pytha.set_element_name(drawer_elem, string.format("%s_%d", attribute_list["drawer"].name, 1))
 
 		loc_origin[1] = general_data.gap
-		if general_data.drawing_symbols == true then 
-			local plan_origin = {loc_origin[1], loc_origin[2], loc_origin[3]}
-			plan_origin[1] = loc_origin[1] + (width - 2 * general_data.gap) / 2
-			plan_origin[2] = loc_origin[2] - 50 - 5
+		local plan_origin = {loc_origin[1], loc_origin[2], loc_origin[3]}
+		plan_origin[1] = loc_origin[1] + (width - 2 * general_data.gap) / 2
+		plan_origin[2] = loc_origin[2] - 50 - 5
 
-			plan_elem = pytha.create_polygon({{plan_origin[1], plan_origin[2], plan_origin[3]},						--Arrow plan drawing
-												{plan_origin[1] - 25, plan_origin[2], plan_origin[3]},
-												{plan_origin[1] - 25, plan_origin[2] - 50, plan_origin[3]},
-												{plan_origin[1] - 50, plan_origin[2] - 50, plan_origin[3]},
-												{plan_origin[1], plan_origin[2] - 100, plan_origin[3]},
-												{plan_origin[1] + 50, plan_origin[2] - 50, plan_origin[3]},
-												{plan_origin[1] + 25, plan_origin[2] - 50, plan_origin[3]},
-												{plan_origin[1] + 25, plan_origin[2], plan_origin[3]}})
-			set_part_attributes(plan_elem, "floor_plan")
-			table.insert(ext_elements, plan_elem)
-			plan_origin[1] = loc_origin[1]
-			plan_origin[2] = plan_origin[2] + 5
-			plan_elem = pytha.create_polygon({{plan_origin[1], plan_origin[2], plan_origin[3]},
-													{plan_origin[1], plan_origin[2] - 5, plan_origin[3]},
-													{plan_origin[1] + width - 2 * general_data.gap, plan_origin[2] - 5, plan_origin[3]},
-													{plan_origin[1] + width - 2 * general_data.gap, plan_origin[2], plan_origin[3]}})
-			set_part_attributes(plan_elem, "floor_plan")
-			table.insert(ext_elements, plan_elem)
-		end
+		plan_elem = pytha.create_polygon({{plan_origin[1], plan_origin[2], plan_origin[3]},						--Arrow plan drawing
+											{plan_origin[1] - 25, plan_origin[2], plan_origin[3]},
+											{plan_origin[1] - 25, plan_origin[2] - 50, plan_origin[3]},
+											{plan_origin[1] - 50, plan_origin[2] - 50, plan_origin[3]},
+											{plan_origin[1], plan_origin[2] - 100, plan_origin[3]},
+											{plan_origin[1] + 50, plan_origin[2] - 50, plan_origin[3]},
+											{plan_origin[1] + 25, plan_origin[2] - 50, plan_origin[3]},
+											{plan_origin[1] + 25, plan_origin[2], plan_origin[3]}})
+		set_part_attributes(plan_elem, "floor_plan")
+		table.insert(ext_elements, plan_elem)
+		plan_origin[1] = loc_origin[1]
+		plan_origin[2] = plan_origin[2] + 5
+		plan_elem = pytha.create_polygon({{plan_origin[1], plan_origin[2], plan_origin[3]},
+												{plan_origin[1], plan_origin[2] - 5, plan_origin[3]},
+												{plan_origin[1] + width - 2 * general_data.gap, plan_origin[2] - 5, plan_origin[3]},
+												{plan_origin[1] + width - 2 * general_data.gap, plan_origin[2], plan_origin[3]}})
+		set_part_attributes(plan_elem, "floor_plan")
+		table.insert(ext_elements, plan_elem)
+
 		loc_origin[1] = 0
 		loc_origin[2] = 0
 		loc_origin[3] = height - drawer_height - top_gap - (general_data.thickness + general_data.gap) / 2
@@ -761,7 +756,7 @@ organization_style_list.drop_down_door = {
 }
 organization_style_list.split_drawers_intelli_doors = {
 	name = pyloc "Drawers and Doors",
-	geometry_function = {create_drawers_call, create_intelli_doors_shelves},
+	geometry_function = {create_drawers_call, create_intelli_doors_2_shelves},
 	ui_update_function = ui_update_oven_drawers_intelli_doors,
 	drawer_list = multi_drawer_setup_list,
 }
